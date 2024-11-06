@@ -1,0 +1,31 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+asttokens = "==2.4.1"
+colorama = "==0.4.6"
+decorator = "==5.1.1"
+executing = "==2.1.0"
+greenlet = "==3.1.1"
+ipython = "==8.29.0"
+jedi = "==0.19.1"
+matplotlib-inline = "==0.1.7"
+parso = "==0.8.4"
+prompt-toolkit = "==3.0.48"
+psycopg2-binary = "==2.9.10"
+pure-eval = "==0.2.3"
+pygments = "==2.18.0"
+python-dotenv = "==1.0.1"
+six = "==1.16.0"
+sqlalchemy = "==2.0.36"
+stack-data = "==0.6.3"
+traitlets = "==5.14.3"
+typing-extensions = "==4.12.2"
+wcwidth = "==0.2.13"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
