@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 .env
 venv/
+setup.py
+epicevents.egg-info/
