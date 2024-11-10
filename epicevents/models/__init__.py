@@ -1,5 +1,7 @@
-from models.user import User
-from models.client import Client
-from models.contract import Contract
-from models.event import Event
+from .user import User
+from .client import Client
+from .contract import Contract
+from .event import Event
+from .base import Base
+
 

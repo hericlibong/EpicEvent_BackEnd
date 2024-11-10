@@ -18,4 +18,4 @@ class Contract(Base):
     # Relations
     client = relationship('Client', back_populates='contracts')
     sales_contact = relationship('User', back_populates='contracts')
-    evnts = relationship('Event', back_populates='contract', cascade='all, delete-orphan')
+    events = relationship('Event', back_populates='contract', cascade='all, delete-orphan')
