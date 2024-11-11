@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Enum as SqlEnum
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 from datetime import datetime
-from utils.roles import UserRole
+
 
 class User(Base):
     __tablename__ ='users'
@@ -25,3 +25,6 @@ class User(Base):
     events = relationship('Event', back_populates='support_contact', cascade='all, delete-orphan')
     role = relationship('Role', back_populates='users')
     department = relationship('Department', back_populates='users')
+
+    def __repr__(self):
+        return f'<User: {self.username}, Role: {self.role.name}>'
