@@ -1,6 +1,6 @@
 from dao.user_dao import UserDAO
 from utils.security import hash_password, create_access_token, verify_password
-# from utils.roles import UserRole
+
 
 class UserController:
     def __init__(self):
@@ -54,7 +54,7 @@ class UserController:
         token_data = {
             'user_id': user.id,
             'username': user.username,
-            'role': user.role.value,
+            'department': user.department.name,
         }
         token = create_access_token(token_data)
         print(f"Utilisateur authentifié : {user.username}")
