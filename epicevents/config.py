@@ -3,15 +3,19 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-load_dotenv()
+def get_database_url():
+    load_dotenv()
+    db_user = os.getenv('DB_USER')
+    db_password = os.getenv('DB_PASSWORD')
+    db_host = os.getenv('DB_HOST', 'localhost')
+    db_port = os.getenv('DB_PORT', '5432')
+    db_name = os.getenv('DB_NAME')
 
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_HOST = os.getenv('DB_HOST', 'localhost')
-DB_PORT = os.getenv('DB_PORT', '5432')
-DB_NAME = os.getenv('DB_NAME')
+    if not all([db_user, db_password, db_name]):
+        raise ValueError("Certaines variables d'environnement sont manquantes.")
 
-DATABASE_URL = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+    return f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
 
+DATABASE_URL = get_database_url()
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
