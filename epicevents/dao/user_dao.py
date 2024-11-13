@@ -33,6 +33,13 @@ class UserDAO:
         """
         return self.session.query(User).all()
     
+    def get_user_by_email(self, email: str) -> User:
+        """
+        Récupère un utilisateur par son adresse email.
+        """
+        return self.session.query(User).filter_by(email=email).first()
+    
+    
     def update_user(self, user_id: int, user_data: dict) -> User:
         """
         Met à jour un utilisateur avec les données fournies.
