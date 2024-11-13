@@ -1,9 +1,4 @@
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
-from config import DATABASE_URL
-
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=engine)
+from config import SessionLocal as Session
 
 class BaseDAO:
     def __init__(self):

@@ -1,10 +1,8 @@
 from models.user import User
-from config import SessionLocal
+from .base_dao import BaseDAO
 
-class UserDAO:
-    def __init__(self):
-        self.session = SessionLocal()
- 
+class UserDAO(BaseDAO):
+    
     def create_user(self, user_data):
         """
         Créer un utilisateur avec les données fournies.
@@ -63,6 +61,3 @@ class UserDAO:
         self.session.delete(user)
         self.session.commit()
         return True
-    
-    def close(self):
-        self.session.close()

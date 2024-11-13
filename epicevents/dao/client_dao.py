@@ -1,9 +1,7 @@
 from models.client import Client
-from config import SessionLocal
+from .base_dao import BaseDAO
 
-class ClientDAO:
-    def __init__(self):
-        self.session = SessionLocal()
+class ClientDAO(BaseDAO):
 
     def create_client(self, client_data):
         """
@@ -50,6 +48,3 @@ class ClientDAO:
         self.session.delete(client)
         self.session.commit()
         return True
-    
-    def close(self):
-        self.session.close()
