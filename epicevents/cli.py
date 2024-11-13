@@ -1,7 +1,7 @@
 import click
 from controllers.user_controller import UserController
-#from sqlalchemy.orm import Session
-from models import Role, Department  # Adjust the import path as necessary
+
+from models import Department  # Adjust the import path as necessary
 from config import SessionLocal
 
 from utils.roles import UserRole
@@ -26,19 +26,7 @@ def create_user():
     session = SessionLocal()
 
     try:
-        # Sélection du rôle
-        roles = session.query(Role).all()
-        if not roles:
-            click.echo("Aucun rôle disponible. Veuillez ajouter des rôles à la base de données.")
-            session.close()
-            return
-
-        role_choices = {str(role.id): role.name for role in roles}
-        click.echo('Rôles disponibles :')
-        for role_id, role_name in role_choices.items():
-            click.echo(f"{role_id}. {role_name}")
-        role_id = click.prompt('Sélectionnez un rôle', type=click.Choice(role_choices.keys()))
-
+        
         # Sélection du département
         departments = session.query(Department).all()
         if not departments:
@@ -59,7 +47,6 @@ def create_user():
             'fullname': fullname,
             'email': email,
             'phone': phone,
-            'role_id': int(role_id),
             'department_id': int(department_id),
         }
 

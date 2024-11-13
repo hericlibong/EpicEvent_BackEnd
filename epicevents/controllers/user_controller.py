@@ -21,6 +21,11 @@ class UserController:
             if existing_email:
                 raise ValueError("Adresse email déjà utilisée.")
             
+
+        # Vérifier que le départment est fourni
+            if not user_data.get('department_id'):
+                raise ValueError("Département non fourni.")
+            
             # Hasher le mot de passe
             user_data['hashed_password'] = hash_password(user_data.pop('password'))
 
