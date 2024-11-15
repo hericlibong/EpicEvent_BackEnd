@@ -1,5 +1,5 @@
 from dao.user_dao import UserDAO
-from utils.security import hash_password, create_access_token, verify_password
+from utils.security import hash_password, create_access_token, verify_password, verify_access_token
 
 
 class UserController:
@@ -100,6 +100,17 @@ class UserController:
             print("Utilisateur non trouvé.")
             return
         print("Utilisateur supprimé avec succès.")
+
+    def verify_token(self, token):
+        """
+        Vérifier un token d'accès.
+        """
+        try:
+            user_data = verify_access_token(token)
+            return user_data
+        except Exception as e:
+            print(f"Erreur de vérification du token : {e}")
+            return None
     
     
     def close(self):

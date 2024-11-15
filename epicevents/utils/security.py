@@ -20,8 +20,10 @@ def verify_access_token(token: str):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except jwt.ExpiredSignatureError:
+        print("Token expiré")
         return None
     except jwt.InvalidTokenError:
+        print("Token invalide")
         return None
 
 

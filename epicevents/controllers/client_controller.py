@@ -1,8 +1,19 @@
 # controllers/client_controller.py
-from utils.decorators import requires_role
-from utils.roles import UserRole
+from dao.client_dao import ClientDAO
 
-@requires_role(UserRole.COMMERCIAL)
-def create_client():
-    # logique pour créer un client
-    pass
+class ClientController:
+    def __init__(self):
+        self.client_dao = ClientDAO()
+
+    def get_all_clients(self):
+        """
+        Récupérer tous les clients.
+        """
+        clients = self.client_dao.get_all_clients()
+        if not clients:
+            print("Aucun client trouvé.")
+            return
+        return clients
+    
+    def close(self):
+        self.client_dao.close()
