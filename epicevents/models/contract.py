@@ -11,7 +11,7 @@ class Contract(Base):
     sales_contact_id = Column(Integer, ForeignKey('users.id'), nullable=False)
     status = Column(Boolean, default=False)
     amount = Column(Float, nullable=False)
-    payment_due = Column(DateTime, nullable=False)
+    remaining_amount = Column(Float, nullable= False)
     date_created = Column(DateTime, default=datetime.now)
     date_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 

@@ -3,6 +3,7 @@ from rich.console import Console
 from rich.table import Table
 from controllers.user_controller import UserController
 from controllers.client_controller import ClientController
+from controllers.contract_controller import ContractController
 
 from models import Department  # Adjust the import path as necessary
 from config import SessionLocal
@@ -12,6 +13,33 @@ from utils.roles import UserRole
 @click.group()
 def cli():
     pass
+
+# @cli.command()
+# def list_contracts():
+#     """
+#     Afficher la liste des contrats.
+#     """
+#     controller = UserController()
+#     token = click.prompt('Veuillez entrer votre Token d\'accès')
+
+#     # Vérifier l'authentification
+#     user_data = controller.verify_token(token)
+#     if not user_data:
+#         click.echo("Token invalide ou expiré. Authentification échouée.")
+#         return
+#     contract_controller = ContractController()
+#     contracts = contract_controller.get_all_contracts()
+
+#     if not contracts:
+#         click.echo("Aucun contrat trouvé.")
+#         return
+    
+#     console = Console()
+#     table = Table(show_header=True, header_style="bold magenta")
+#     table.add_column("ID", style="dim")
+#     table.add_column("Nom du client")
+#     table.add_column("Commercial concerné")
+#     table.add_column("Motant total")    
 
 @cli.command()
 def list_clients():
