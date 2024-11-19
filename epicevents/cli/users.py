@@ -2,6 +2,7 @@ import click
 from controllers.user_controller import UserController
 from models import Department
 from config import SessionLocal
+from utils.decorators import require_permission
 
 @click.group()
 def users():
@@ -9,7 +10,8 @@ def users():
     pass
 
 @users.command()
-def create():
+@require_permission('can_manage_users')
+def create(user_data):
     """
     Enregistrer un utilisateur avec les données fournies.
     """
@@ -51,7 +53,7 @@ def create():
         # Enregistrer l'utilisateur via le contrôleur
         controller = UserController()
         try:
-            user = controller.register_user(user_data)
+            user = controller.register_user(user_data) # Vérifier l'argument de la fonction
             if user:
                 click.echo(f"Utilisateur créé avec succès : {user.username}")
             else:
@@ -62,6 +64,23 @@ def create():
             controller.close()
     finally:
         session.close()
+
+@users.command()
+@require_permission('can_manage_users')
+def delete():
+    """
+    Supprimer un utilisateur avec l'ID fourni.
+    """
+    user_id = click.prompt('ID de l\'utilisateur à supprimer', type=int)
+
+    controller = UserController()
+    success = controller.delete_user(user_id)
+    controller.close()
+
+    if success:
+        click.echo(f"Utilisateur ID {user_id} supprimé avec succès.")
+    else:
+        click.echo("Erreur lors de la suppression de l'utilisateur.")
 
 
 

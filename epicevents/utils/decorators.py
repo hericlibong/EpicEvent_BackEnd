@@ -1,32 +1,36 @@
 # utils/decorators.py
+import functools
+import click
+from controllers.user_controller import UserController
+from utils.permissions import has_permission
+import inspect  # Pour inspecter les arguments de la fonction (précision de l'argument 'user_data')
 
-from functools import wraps
-from utils.security import verify_access_token
-from utils.roles import UserRole
-
-def requires_role(required_role):
-    """
-    Décorateur pour vérifier que l'utilisateur a le rôle requis.
-    """
+def require_permission(permission):
     def decorator(f):
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            # Récupérer le token depuis les arguments ou le contexte
-            token = kwargs.get('token')
-            if not token:
-                print("Token manquant.")
+        @functools.wraps(f)
+        def wrapper(*args, **kwargs):
+            controller = UserController()
+            token = click.prompt('Veuillez entrer votre Token d\'accès')
+
+            # Vérifier l'authentification
+            user_data = controller.verify_token(token)
+            if not user_data:
+                click.echo("Token invalide ou expiré. Authentification échouée.")
                 return
 
-            payload = verify_access_token(token)
-            if not payload:
-                print("Accès non autorisé : token invalide.")
+            # Vérifier les permissions en fonction du département de l'utilisateur
+            user_department = user_data.get('department')
+            if not has_permission(user_department, permission):
+                # To do : personnaliser le message d'erreur
+                click.echo("Vous n'avez pas la permission d'effectuer cette action.")
                 return
-
-            user_role = payload.get('role')
-            if user_role != required_role.value:
-                print(f"Accès non autorisé : rôle {user_role} requis {required_role.value}.")
-                return
-
-            return f(*args, **kwargs)
-        return decorated_function
+            
+            # Determiner si la fonction a besoin des données utilisateur 'user_data'
+            sig = inspect.signature(f)
+            if 'user_data' not in sig.parameters:
+                return f(user_data, *args, **kwargs)
+            else:
+                return f(user_data, *args, **kwargs)
+        return wrapper
     return decorator
+

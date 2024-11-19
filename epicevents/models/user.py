@@ -25,4 +25,4 @@ class User(Base):
     department = relationship('Department', back_populates='users')
 
     def __repr__(self):
-        return f'<User: {self.username}, Role: {self.role.name}>'
+        return f'<User: {self.username}, department: {self.department.name}>'

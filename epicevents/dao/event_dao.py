@@ -38,6 +38,21 @@ class EventDAO(BaseDAO):
         self.session.refresh(event)
         return event
     
+    def assign_support(self, event_id, support_user_id):
+        event = self.get_event_by_id(event_id)
+        if event:
+            event.support_contact_id = support_user_id
+            self.session.commit()
+            self.session.refresh(event)
+            return event
+        return None
+    
+    def get_events_by_support(self, support_user_id):
+        """
+        Récupère tous les événements d'un contact de support.
+        """
+        return self.session.query(Event).filter_by(support_contact_id=support_user_id).all()
+    
     def delete_event(self, event_id: int):
         """
         Supprime un événement par son identifiant.

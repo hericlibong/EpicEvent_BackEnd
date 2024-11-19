@@ -38,6 +38,12 @@ class ClientDAO(BaseDAO):
         self.session.refresh(client)
         return client
     
+    def get_clients_by_sales_contact(self, sales_contact_id: int):
+        """
+        Récupère tous les clients d'un contact commercial.
+        """
+        return self.session.query(Client).filter_by(sales_contact_id=sales_contact_id).all()
+    
     def delete_client(self, client_id: int):
         """
         Supprime un client par son identifiant.

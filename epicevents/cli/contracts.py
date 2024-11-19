@@ -4,11 +4,128 @@ from rich.console import Console
 from rich.table import Table
 from controllers.contract_controller import ContractController
 from controllers.user_controller import UserController
+from controllers.client_controller import ClientController
+from utils.decorators import require_permission
 
 @click.group()
 def contracts():
     """Commandes pour gérer les contrats."""
     pass
+
+@contracts.command()
+@require_permission('can_create_contracts')
+def create(user_data):
+    """
+    Créer un nouveau contrat
+    """
+
+    # Collecte des informations du contrat
+    client_id = click.prompt('ID du client', type=int)
+    amount = click.prompt('Montant total', type=float)
+    remaining_amount = click.prompt('Montant restant', type=float)
+    status = click.prompt('Statut (1 pour signé, 0 pour en attente)', type=int)
+
+    contract_data = {
+        'client_id': client_id,
+        'amount': amount,
+        'remaining_amount': remaining_amount,
+        'status': bool(status),
+        'sales_contact_id': user_data.get('id')
+    }
+
+    # Créer le contrat via le contrôleur
+    contract_controller = ContractController()
+    contract = contract_controller.create_contract(contract_data)
+    contract_controller.close()
+
+    if contract:
+        click.echo(f"Contrat créé avec succès : ID {contract.id}")
+    else:
+        click.echo("Erreur lors de la création du contrat.")
+
+
+@contracts.command(name='update-all')
+@require_permission('can_modify_all_contracts')
+def update_any_contract(user_data):
+    """
+    Mettre à jour un contrat existant.
+    """
+    contract_id = click.prompt('ID du contrat à mettre à jour', type=int)
+
+    # Collecte des informations du contrat
+    amount = click.prompt('Montant total', type=float)
+    remaining_amount = click.prompt('Montant restant', type=float)
+    status = click.prompt('Statut (1 pour signé, 0 pour en attente)', type=int)
+
+    contract_data = {
+        'amount': amount,
+        'remaining_amount': remaining_amount,
+        'status': bool(status),
+        'sales_contact_id': user_data.get('id')
+    }
+
+    # Mettre à jour le contrat via le contrôleur
+    contract_controller = ContractController()
+    contract = contract_controller.update_contract(contract_id, contract_data)
+    contract_controller.close()
+
+    if contract:
+        click.echo(f"Contrat mis à jour avec succès : ID {contract.id}")
+    else:
+        click.echo("Erreur lors de la mise à jour du contrat.")
+
+
+@contracts.command(name='update-own')
+@require_permission('can_modify_own_contracts')
+def update_own_contract(user_data):
+    """
+    Mettre à jour un contrat dont vous êtes responsable.
+    """
+    contract_id = click.prompt('ID du contrat à mettre à jour', type=int)
+
+    # Vérifier que le contrat appartient à l'utilisateur
+    contract_controller = ContractController()
+    contract = contract_controller.get_contract_by_id(contract_id)
+    if not contract:
+        click.echo("Contrat introuvable.")
+        contract_controller.close()
+        return
+    
+    client_controller = ClientController()
+    client = client_controller.get_client_by_id(contract.client_id)
+    if not client:
+        click.echo("Client associé au contrat non trouvé.")
+        contract_controller.close()
+        client_controller.close()
+        return
+
+    if client.sales_contact_id != user_data.get('id'):
+        click.echo("Vous n'êtes pas responsable de ce contrat.")
+        contract_controller.close()
+        client_controller.close()
+        return
+    
+    # Collecte des informations du contrat
+    amount = click.prompt('Nouveau montant total', default=contract.amount, type=float)
+    remaining_amount = click.prompt('Nouveau montant restant', default=contract.remaining_amount, type=float)
+    status = click.prompt('Nouveau statut (1 pour signé, 0 pour en attente)', default=int(contract.status), type=int)
+
+    contract_data = {
+        'amount': amount,
+        'remaining_amount': remaining_amount,
+        'status': bool(status),
+    }
+
+    # Mettre à jour le contrat via le contrôleur
+    updated_contract = contract_controller.update_contract(contract_id, contract_data)
+    contract_controller.close()
+    client_controller.close()
+
+    if updated_contract:
+        click.echo(f"Contrat mis à jour avec succès : ID {updated_contract.id}")
+    else:
+        click.echo("Erreur lors de la mise à jour du contrat.")
+
 
 @contracts.command()
 def list():

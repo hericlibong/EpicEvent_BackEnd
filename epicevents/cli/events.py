@@ -4,11 +4,31 @@ from rich.console import Console
 from rich.table import Table
 from controllers.event_controller import EventController
 from controllers.user_controller import UserController
+from utils.decorators import require_permission
 
 @click.group()
 def events():
     """Commandes pour gérer les événements."""
     pass
+
+@events.command()
+@require_permission('can_modify_all_events')
+def assign_support(): # Pourquoi user_data en argument alors qu'il n'est pas appelé?
+    """
+    Assigner un contact support à un événement.
+    """
+    event_id = click.prompt('ID de l\'événement à mettre à jour', type=int)
+    support_user_id = click.prompt('ID du contact support', type=int)
+
+    event_controller = EventController()
+    success = event_controller.assign_support(event_id, support_user_id)
+    event_controller.close()
+    
+    if success:
+        click.echo(f"Contact support assigné avec succès à l'événement ID {event_id}")
+    else:
+        click.echo("Erreur lors de l'assignation du contact support.")
+
 
 @events.command()
 def list():

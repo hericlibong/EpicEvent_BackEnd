@@ -38,6 +38,18 @@ class ContractDAO(BaseDAO):
         self.session.refresh(contract)
         return contract
     
+    def get_contracts_by_client_id(self, client_id: int):
+        """
+        Récupère tous les contrats d'un client.
+        """
+        return self.session.query(Contract).filter_by(client_id=client_id).all()
+    
+    def get_contract_by_sales_contact(self, sales_contact_id: int):
+        """
+        Récupère tous les contrats d'un contact commercial.
+        """
+        return self.session.query(Contract).filter_by(sales_contact_id=sales_contact_id).all()
+    
     def delete_contract(self, contract_id: int):
         """
         Supprime un contrat par son identifiant.

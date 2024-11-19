@@ -4,6 +4,7 @@ from rich.console import Console
 from rich.table import Table
 from controllers.client_controller import ClientController
 from controllers.user_controller import UserController
+from utils.decorators import require_permission
 
 @click.group()
 def clients():
@@ -11,7 +12,160 @@ def clients():
     pass
 
 @clients.command()
-def list():
+@require_permission('can_create_clients')
+def create(user_data):
+    """
+    Créer un nouveau client.
+    """
+    # Collecte des informations du client
+    fullname = click.prompt('Nom complet')
+    email = click.prompt('Adresse email', default='')
+    phone = click.prompt('Numéro de téléphone', default='')
+    company_name = click.prompt('Nom de l\'entreprise', default='')
+
+    client_data = {
+        'fullname': fullname,
+        'email': email,
+        'phone': phone,
+        'company_name': company_name,
+        'sales_contact_id': user_data.get('user_id')
+    }
+
+    # Créer le client via le contrôleur
+    client_controller = ClientController()
+    client = client_controller.create_client(client_data)
+    client_controller.close()
+
+    if client:
+        click.echo(f"Client créé avec succès : ID {client.fullname}")
+    else:
+        click.echo("Erreur lors de la création du client.")
+
+@clients.command(name='update-all')
+@require_permission('can_modify_all_clients')
+def update_any_client(user_data):
+    """
+    Mettre à jour un client dont vous êtes responsable.
+    """
+    client_id = click.prompt('ID du client à mettre à jour', type=int)
+
+    # Vérifier que le client appartient à l'utilisateur
+    client_controller = ClientController()
+    client = client_controller.get_client(client_id)
+    if client.sales_contact_id != user_data['user_id']:
+        click.echo("Vous n'êtes pas responsable de ce client.")
+        client_controller.close()
+        return
+
+    # Collecte des informations du client
+    fullname = click.prompt('Nouveau nom complet', default=client.fullname)
+    email = click.prompt('Nouvelle adresse email', default=client.email)
+    phone = click.prompt('Nouveau numéro de téléphone', default= client.phone)
+
+    client_data = {
+        'fullname': fullname,
+        'email': email,
+        'phone': phone,
+    }
+
+    # Mettre à jour le client via le contrôleur
+    updated_client = client_controller.update_client(client_id, client_data)
+    client_controller.close()
+
+    if updated_client:
+        click.echo(f"Client mis à jour avec succès : {updated_client.fullname}")
+    else:
+        click.echo("Erreur lors de la mise à jour du client.")
+
+@clients.command(name='update-own')
+@require_permission('can_modify_own_clients')
+def update_own_client(user_data):
+    """
+    Mettre à jour un client dont vous êtes responsable.
+    """
+    client_id = click.prompt('ID du client à mettre à jour', type=int)
+
+    # Vérifier que le client appartient à l'utilisateur
+    client_controller = ClientController()
+    client = client_controller.get_client_by_id(client_id)
+    if not client:
+        click.echo("Client non trouvé.")
+        client_controller.close()
+        return
+    
+    if client.sales_contact_id != user_data['user_id']:
+        click.echo("Vous n'êtes pas responsable de ce client.")
+        client_controller.close()
+        return
+    
+    # Collecte des informations du client
+    fullname = click.prompt('Nouveau nom complet', default=client.fullname)
+    email = click.prompt('Nouvelle adresse email', default=client.email)
+    phone = click.prompt('Nouveau numéro de téléphone', default= client.phone)
+
+    client_data = {
+        'fullname': fullname,
+        'email': email,
+        'phone': phone,
+    }
+
+    # Mettre à jour le client via le contrôleur
+    updated_client = client_controller.update_client(client_id, client_data)
+    client_controller.close()
+
+    if updated_client:
+        click.echo(f"Client mis à jour avec succès : {updated_client.fullname}")
+    else:
+        click.echo("Erreur lors de la mise à jour du client.")
+
+@clients.command(name='delete-own')
+@require_permission('can_modify_own_clients')
+def delete_own_client(user_data):
+    """
+    Supprimer un client dont vous êtes responsable.
+    """
+    client_id = click.prompt('ID du client à supprimer', type=int)
+
+    client_controller = ClientController()
+    client = client_controller.get_client_by_id(client_id)
+    if not client:
+        click.echo("Client non trouvé.")
+        client_controller.close()
+        return
+    
+    if client.sales_contact_id != user_data['user_id']:
+        click.echo("Vous n'êtes pas responsable de ce client.")
+        client_controller.close()
+        return
+    
+    success = client_controller.delete_client(client_id)
+    client_controller.close()
+
+    if success:
+        click.echo(f"Client supprimé avec succès : ID {client_id}")
+    else:
+        click.echo("Erreur lors de la suppression du client.")
+
+@clients.command(name='delete-all')
+@require_permission('can_modify_all_clients')
+def delete_any_client():
+    """
+    Supprimer un client quelconque.
+    """
+    client_id = click.prompt('ID du client à supprimer', type=int)
+
+    client_controller = ClientController()
+    success = client_controller.delete_client(client_id)
+    client_controller.close()
+
+    if success:
+        click.echo(f"Client supprimé avec succès : ID {client_id}")
+    else:
+        click.echo("Erreur lors de la suppression du client.")
+
+
+@clients.command()
+def list_clients():
     """
     Afficher la liste des clients.
     """
