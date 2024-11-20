@@ -9,6 +9,7 @@ DEPARTMENT_PERMISSIONS = {
         'can_modify_all_events': True,
         'can_filter_events': True,
         'can_filter_contracts': True,
+        'can_modify_all_clients': True,
     },
     'Commercial': {
         'can_create_clients': True,

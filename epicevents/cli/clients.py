@@ -45,27 +45,34 @@ def create(user_data):
 @require_permission('can_modify_all_clients')
 def update_any_client(user_data):
     """
-    Mettre à jour un client dont vous êtes responsable.
+    Mettre à jour les clients sans restriction.
     """
     client_id = click.prompt('ID du client à mettre à jour', type=int)
 
     # Vérifier que le client appartient à l'utilisateur
     client_controller = ClientController()
-    client = client_controller.get_client(client_id)
-    if client.sales_contact_id != user_data['user_id']:
-        click.echo("Vous n'êtes pas responsable de ce client.")
-        client_controller.close()
-        return
+    client = client_controller.get_client_by_id(client_id)
+    # if client.sales_contact_id != user_data['user_id']:  # Vérifier si l'utilisateur est responsable du client
+    #     click.echo("Vous n'êtes pas responsable de ce client.")
+    #     client_controller.close()
+    #     return
+
 
     # Collecte des informations du client
     fullname = click.prompt('Nouveau nom complet', default=client.fullname)
     email = click.prompt('Nouvelle adresse email', default=client.email)
     phone = click.prompt('Nouveau numéro de téléphone', default= client.phone)
+    company_name = click.prompt('Nouveau nom de l\'entreprise', default=client.company_name)
+    sales_contact_id = click.prompt('Nouveau commercial', default=client.sales_contact_id)
 
     client_data = {
         'fullname': fullname,
         'email': email,
         'phone': phone,
+        'company_name': company_name,
+        'sales_contact_id': sales_contact_id
+
+        
     }
 
     # Mettre à jour le client via le contrôleur
@@ -185,17 +192,31 @@ def list_clients():
         return
     
     console = Console()
-    table = Table(show_header=True, header_style="bold magenta")
+    table = Table(
+
+        title="[bold cyan]Tableau des clients[/]",
+        show_header=True,
+        show_lines=True, 
+        header_style="bold magenta")
     table.add_column("ID", style="dim")
     table.add_column("Nom")
     table.add_column("Email")
     table.add_column("Téléphone")
+    table.add_column("Entreprise")
+    table.add_column("Date de création", style="dim")
+    table.add_column("Dernière mise à jour", style="dim")
+    table.add_column("Commercial", style="dim")
 
     for client in clients:
         table.add_row(
             str(client.id), 
             client.fullname,
             client.email or "",
-            client.phone or "", 
-            )
+            client.phone or "",
+            client.company_name or "",
+            client.date_created.strftime("%d/%m/%Y %H:%M:%S"),
+            client.date_updated.strftime("%d/%m/%Y %H:%M:%S"),
+            client.sales_contact.fullname
+            
+        )
     console.print(table)

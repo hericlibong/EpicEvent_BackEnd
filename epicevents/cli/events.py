@@ -51,11 +51,15 @@ def list():
         return
     
     console = Console()
-    table = Table(show_header=True, header_style="bold magenta")
+    table = Table(
+        title="[bold cyan]Tableau des Evènements[/]",
+        show_header=True, 
+        show_lines=True,
+        header_style="bold magenta")
     table.add_column("ID", style="dim")
     table.add_column("Numéro de contrat")
     table.add_column("Nom du client")
-    table.add_column("Contact client")
+    table.add_column("Contact client", width=30)
     table.add_column("Date de début")
     table.add_column("Date de fin")
     table.add_column("Contact support")
@@ -68,7 +72,7 @@ def list():
             str(event.id),
             str(event.contract_id),
             event.contract.client.fullname if event.contract and event.contract.client else "Non défini",
-            (f"{event.contract.client.email or 'N/A'} / {event.contract.client.phone or 'N/A'}"
+            (f"Email:{event.contract.client.email or 'N/A'} | tel:{event.contract.client.phone or 'N/A'}"
             if event.contract and event.contract.client else "Non défini"),
             event.event_date_start.strftime("%d/%m/%Y %H:%M") if event.event_date_start else "N/A",
             event.event_date_end.strftime("%d/%m/%Y %H:%M") if event.event_date_end else "N/A",

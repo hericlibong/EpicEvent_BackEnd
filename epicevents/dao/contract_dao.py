@@ -17,7 +17,7 @@ class ContractDAO(BaseDAO):
         """
         Récupère un contrat par son identifiant.
         """
-        return self.session.query(Contract).filter_by(Contract.id==contract_id).first()
+        return self.session.query(Contract).filter_by(id=contract_id).first()
     
     def get_all_contracts(self):
         """

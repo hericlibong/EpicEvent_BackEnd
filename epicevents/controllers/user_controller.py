@@ -56,6 +56,7 @@ class UserController:
             'username': user.username,
             'department': user.department.name,
         }
+        print(f"Token data : {token_data}")
         token = create_access_token(token_data)
         print(f"Utilisateur authentifié : {user.username}")
         return token

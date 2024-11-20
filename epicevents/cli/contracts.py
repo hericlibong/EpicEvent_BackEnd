@@ -24,13 +24,14 @@ def create(user_data):
     amount = click.prompt('Montant total', type=float)
     remaining_amount = click.prompt('Montant restant', type=float)
     status = click.prompt('Statut (1 pour signé, 0 pour en attente)', type=int)
+    sales_contact_id = click.prompt('ID du commercial', type=int)
 
     contract_data = {
         'client_id': client_id,
         'amount': amount,
         'remaining_amount': remaining_amount,
         'status': bool(status),
-        'sales_contact_id': user_data.get('id')
+        'sales_contact_id': sales_contact_id
     }
 
     # Créer le contrat via le contrôleur
@@ -99,8 +100,14 @@ def update_own_contract(user_data):
         client_controller.close()
         return
 
-    if client.sales_contact_id != user_data.get('id'):
-        click.echo("Vous n'êtes pas responsable de ce contrat.")
+    # if client.sales_contact_id != user_data.get('id'):
+    #     click.echo("Vous n'êtes pas responsable de ce contrat.")
+    #     contract_controller.close()
+    #     client_controller.close()
+    #     return
+
+    if client.sales_contact_id != user_data['user_id']:
+        click.echo("Vous n'êtes pas responsable de ce client.")
         contract_controller.close()
         client_controller.close()
         return

@@ -20,6 +20,7 @@ def require_permission(permission):
 
             # Vérifier les permissions en fonction du département de l'utilisateur
             user_department = user_data.get('department')
+            print(f"votre département: {user_department}")
             if not has_permission(user_department, permission):
                 # To do : personnaliser le message d'erreur
                 click.echo("Vous n'avez pas la permission d'effectuer cette action.")

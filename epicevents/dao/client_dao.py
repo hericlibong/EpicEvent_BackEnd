@@ -17,7 +17,7 @@ class ClientDAO(BaseDAO):
         """
         Récupère un client par son identifiant.
         """
-        return self.session.query(Client).filter_by(Client.id==client_id).first()
+        return self.session.query(Client).filter_by(id=client_id).first()
     
     def get_all_clients(self):
         """
