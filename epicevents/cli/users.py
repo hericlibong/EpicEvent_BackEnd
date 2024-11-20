@@ -2,12 +2,52 @@ import click
 from controllers.user_controller import UserController
 from models import Department
 from config import SessionLocal
+from rich.table import Table
+from rich.console import Console
 from utils.decorators import require_permission
 
 @click.group()
 def users():
     """Commandes pour gérer les utilisateurs."""
     pass
+
+@users.command(name='list-users')
+@require_permission('can_list_users')
+def list():
+    """
+    Lister tous les utilisateurs.
+    """
+    controller = UserController()
+    users = controller.get_users_list()
+    controller.close()
+
+    if not users:
+        click.echo("Aucun utilisateur trouvé.")
+        return
+
+    console = Console()
+    table = Table(title="[bold cyan]Liste des utilisateurs[/]",
+                  show_header=True,
+                  show_lines=True,
+                  header_style="bold magenta")
+    table.add_column("ID", style="dim")
+    table.add_column("Nom d'utilisateur")
+    table.add_column("Nom complet")
+    table.add_column("Email")
+    table.add_column("Téléphone")
+    table.add_column("Département")
+
+    for user in users:
+        table.add_row(
+            str(user.id),
+            user.username,
+            user.fullname,
+            user.email,
+            user.phone,
+            user.department.name
+        )
+    console.print(table)
+   
 
 @users.command()
 @require_permission('can_manage_users')

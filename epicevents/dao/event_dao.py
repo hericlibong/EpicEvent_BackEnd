@@ -1,5 +1,7 @@
 from models.event import Event
 from .base_dao import BaseDAO
+from sqlalchemy.orm import joinedload
+from models.contract import Contract
 
 class EventDAO(BaseDAO):
 
@@ -19,11 +21,15 @@ class EventDAO(BaseDAO):
         """
         return self.session.query(Event).filter_by(id=event_id).first()
     
+    
     def get_all_events(self):
         """
         Récupère tous les événements.
         """
-        return self.session.query(Event).all()
+        return self.session.query(Event).options(
+            joinedload(Event.contract).joinedload(Contract.client),
+            joinedload(Event.support_contact)
+        ).all()
     
     def update_event(self, event_id: int, event_data: dict):
         """
@@ -47,11 +53,17 @@ class EventDAO(BaseDAO):
             return event
         return None
     
+    # def get_events_by_support(self, support_user_id):
+    #     """
+    #     Récupère tous les événements d'un contact de support.
+    #     """
+    #     return self.session.query(Event).filter_by(support_contact_id=support_user_id).all()
+
     def get_events_by_support(self, support_user_id):
-        """
-        Récupère tous les événements d'un contact de support.
-        """
-        return self.session.query(Event).filter_by(support_contact_id=support_user_id).all()
+        return self.session.query(Event).options(
+            joinedload(Event.contract).joinedload(Contract.client),
+            joinedload(Event.support_contact)
+        ).filter_by(support_contact_id=support_user_id).all()
     
     def delete_event(self, event_id: int):
         """

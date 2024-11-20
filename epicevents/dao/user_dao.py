@@ -1,5 +1,6 @@
 from models.user import User
 from .base_dao import BaseDAO
+from sqlalchemy.orm import joinedload
 
 class UserDAO(BaseDAO):
     
@@ -25,11 +26,19 @@ class UserDAO(BaseDAO):
         """
         return self.session.query(User).filter_by(id=user_id).first()
     
-    def get_all_users(self) -> list[User]:
+    # def get_all_users(self) -> list[User]:
+    #     """
+    #     Récupère tous les utilisateurs.
+    #     """
+    #     return self.session.query(User).all()
+
+    def get_all_users(self):
         """
         Récupère tous les utilisateurs.
         """
-        return self.session.query(User).all()
+        return self.session.query(User).options(
+            joinedload(User.department)
+        ).all()
     
     def get_user_by_email(self, email: str) -> User:
         """
