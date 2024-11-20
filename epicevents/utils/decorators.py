@@ -29,7 +29,7 @@ def require_permission(permission):
             # Determiner si la fonction a besoin des données utilisateur 'user_data'
             sig = inspect.signature(f)
             if 'user_data' not in sig.parameters:
-                return f(user_data, *args, **kwargs)
+                return f(*args, **kwargs)
             else:
                 return f(user_data, *args, **kwargs)
         return wrapper

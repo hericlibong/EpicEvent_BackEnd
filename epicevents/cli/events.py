@@ -4,6 +4,8 @@ from rich.console import Console
 from rich.table import Table
 from controllers.event_controller import EventController
 from controllers.user_controller import UserController
+from controllers.client_controller import ClientController
+from controllers.contract_controller import ContractController
 from utils.decorators import require_permission
 
 @click.group()
@@ -11,8 +13,62 @@ def events():
     """Commandes pour gérer les événements."""
     pass
 
+@events.command(name ='create-event')
+@require_permission('can_create_events')
+def create(user_data):
+    """
+    Créer un nouvel évènement
+    """
+    client_id = click.prompt('ID du client', type=int)
+
+    # Vérifier que le client appartient à l'utilisateur
+    client_controller = ClientController()
+    client = client_controller.get_client_by_id(client_id)
+    if client.sales_contact_id != user_data['user_id']:
+        click.echo("Vous n'êtes pas responsable de ce client.")
+        client_controller.close()
+        return
+    
+    # Vérifier que le client a un contrat signé
+    contract_controller = ContractController()
+    contracts = contract_controller.get_contracts_by_client_id(client_id)
+    signed_contracts = [c for c in contracts if c.status]
+    if not signed_contracts:
+        click.echo("Le client n'a pas de contrat signé.")
+        contract_controller.close()
+        client_controller.close()
+        return
+    
+    # Collecte des informations de l'événement
+    event_date_start = click.prompt('Date de début de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
+    event_date_end = click.prompt('Date de fin de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
+    location = click.prompt('Lieu de l\'évènement', default='')
+    attendees = click.prompt('Nombre de participants', type=int, default=0)
+    notes = click.prompt('Notes supplémentaires', default='')
+
+    event_data = {
+        'contract_id': signed_contracts[0].id,  # Utiliser le premier contrat signé
+        'event_date_start': event_date_start,
+        'event_date_end': event_date_end,
+        'location': location,
+        'attendees': attendees,
+        'notes': notes
+    }
+
+    event_controller = EventController()
+    event = event_controller.create_event(event_data)
+    event_controller.close()
+    contract_controller.close()
+    client_controller.close()
+
+    if event:
+        click.echo(f"Evènement créé avec succès : ID {event.id}")
+    else:
+        click.echo("Erreur lors de la création de l'évènement.")
+    
+
 @events.command()
-@require_permission('can_modify_all_events')
+@require_permission('can_assign_support')
 def assign_support(): # Pourquoi user_data en argument alors qu'il n'est pas appelé?
     """
     Assigner un contact support à un événement.
@@ -59,13 +115,15 @@ def list():
     table.add_column("ID", style="dim")
     table.add_column("Numéro de contrat")
     table.add_column("Nom du client")
-    table.add_column("Contact client", width=30)
+    table.add_column("Contact client", width=25)
     table.add_column("Date de début")
     table.add_column("Date de fin")
     table.add_column("Contact support")
     table.add_column("Lieu")
     table.add_column("Nombre de participants")
     table.add_column("Notes")
+    table.add_column("Date de création", style="dim")
+    table.add_column("Date de modification", style="dim")
 
     for event in events:
         table.add_row(
@@ -79,6 +137,8 @@ def list():
             event.support_contact.fullname if event.support_contact else "Non défini",
             event.location or "N/A",
             str(event.attendees) if event.attendees is not None else "0",
-            event.notes or "N/A"
+            event.notes or "N/A",
+            event.date_created.strftime("%d/%m/%Y %H:%M"),
+            event.date_updated.strftime("%d/%m/%Y %H:%M")
         )
     console.print(table)

@@ -17,7 +17,7 @@ class EventDAO(BaseDAO):
         """
         Récupère un événement par son identifiant.
         """
-        return self.session.query(Event).filter_by(Event.id==event_id).first()
+        return self.session.query(Event).filter_by(id=event_id).first()
     
     def get_all_events(self):
         """
