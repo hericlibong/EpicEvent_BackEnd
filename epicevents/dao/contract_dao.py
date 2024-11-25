@@ -1,5 +1,6 @@
 from models.contract import Contract
 from .base_dao import BaseDAO
+from sqlalchemy.orm import joinedload
 
 class ContractDAO(BaseDAO):
 
@@ -19,11 +20,19 @@ class ContractDAO(BaseDAO):
         """
         return self.session.query(Contract).filter_by(id=contract_id).first()
     
+    # def get_all_contracts(self):
+    #     """
+    #     Récupère tous les contrats.
+    #     """
+    #     return self.session.query(Contract).all()
+    
     def get_all_contracts(self):
         """
         Récupère tous les contrats.
         """
-        return self.session.query(Contract).all()
+        return self.session.query(Contract).options(
+            joinedload(Contract.client), 
+            joinedload(Contract.sales_contact)).all()
     
     def update_contract(self, contract_id: int, contract_data: dict):
         """
@@ -44,11 +53,27 @@ class ContractDAO(BaseDAO):
         """
         return self.session.query(Contract).filter_by(client_id=client_id).all()
     
+    # def get_contract_by_sales_contact(self, sales_contact_id: int):
+    #     """
+    #     Récupère tous les contrats d'un contact commercial.
+    #     """
+    #     return self.session.query(Contract).filter_by(sales_contact_id=sales_contact_id).all()
+    
     def get_contract_by_sales_contact(self, sales_contact_id: int):
         """
         Récupère tous les contrats d'un contact commercial.
         """
-        return self.session.query(Contract).filter_by(sales_contact_id=sales_contact_id).all()
+        return self.session.query(Contract).options(
+            joinedload(Contract.client), 
+            joinedload(Contract.sales_contact)).filter_by(sales_contact_id=sales_contact_id).all()
+        
+    
+    def get_contracts_by_event_id(self, event_id: int):
+        """
+        Récupère tous les contrats d'un événement.
+        """
+        return self.session.query(Contract).filter_by(event_id=event_id).all()
+    
     
     def delete_contract(self, contract_id: int):
         """
