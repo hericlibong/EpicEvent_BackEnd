@@ -37,7 +37,21 @@ def create(user_data):
     client_controller.close()
 
     if client:
-        click.echo(f"Client créé avec succès : ID {client.fullname}")
+
+        console = Console()
+        table = Table(title="Client créé avec succès", show_header=False)
+
+        table.add_column("champ", style="bold cyan")
+        table.add_column("valeur", style="bold magenta")
+
+        table.add_row("ID", str(client.id))
+        table.add_row("Nom complet", client.fullname)
+        table.add_row("Email", client.email)
+        table.add_row("Téléphone", client.phone)
+        table.add_row("Entreprise", client.company_name)
+        table.add_row("Commercial", client.sales_contact.fullname)
+        console.print(table)
+
     else:
         click.echo("Erreur lors de la création du client.")
 

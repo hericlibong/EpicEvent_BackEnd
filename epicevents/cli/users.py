@@ -13,7 +13,7 @@ def users():
 
 @users.command(name='list-users')
 @require_permission('can_list_users')
-def list():
+def list(user_data):
     """
     Lister tous les utilisateurs.
     """
@@ -96,6 +96,17 @@ def create(user_data):
             user = controller.register_user(user_data) # Vérifier l'argument de la fonction
             if user:
                 click.echo(f"Utilisateur créé avec succès : {user.username}")
+                console = Console()
+                table = Table(title="Utilisateur créé avec succès", show_header=False)
+                table.add_column("champ", style="bold cyan")
+                table.add_column("valeur", style="bold magenta")
+                table.add_row("ID", str(user.id))
+                table.add_row("Nom d'utilisateur", user.username)
+                table.add_row("Nom complet", user.fullname) 
+                table.add_row("Email", user.email)
+                table.add_row("Téléphone", user.phone)
+                table.add_row("Département", user.department.name)
+                console.print(table)
             else:
                 click.echo("Erreur lors de la création de l'utilisateur.")
         except ValueError as e:

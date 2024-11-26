@@ -1,16 +1,29 @@
 from models.client import Client
 from .base_dao import BaseDAO
+from sqlalchemy.orm import joinedload
 
 class ClientDAO(BaseDAO):
 
     def create_client(self, client_data):
         """
-        Créer un client avec les données fournies.
+        Crée un client avec les données fournies.
         """
         client = Client(**client_data)
         self.session.add(client)
         self.session.commit()
-        self.session.refresh(client)
+
+        # Recharger le client avec les relations nécessaires
+        client = self.session.query(Client).options(
+            joinedload(Client.sales_contact),
+            # Ajoutez d'autres relations que vous souhaitez charger
+        ).filter_by(id=client.id).one()
+
+        # Détacher l'objet de la session
+        self.session.expunge(client)
+
+        # Fermer la session si nécessaire
+        # self.session.close()
+
         return client
     
     def get_client_by_id(self, client_id: int):

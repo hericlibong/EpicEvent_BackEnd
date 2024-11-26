@@ -11,7 +11,15 @@ class UserDAO(BaseDAO):
         user = User(**user_data)
         self.session.add(user)
         self.session.commit()
-        self.session.refresh(user)
+        #self.session.refresh(user)
+
+        # Recharger l'utilisateur avec les relations nécessaires
+        user = self.session.query(User).options(
+            joinedload(User.department)
+        ).filter_by(id=user.id).one()
+
+        # Détacher l'objet de la session
+        self.session.expunge(user)
         return user
     
     def get_user_by_username(self, username: str) -> User:
