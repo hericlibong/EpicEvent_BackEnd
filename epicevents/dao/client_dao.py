@@ -35,15 +35,18 @@ class ClientDAO(BaseDAO):
             if isinstance(e.orig, UniqueViolation):
                 # Extraire le nom de la contrainte unique
                 constraint_name = e.orig.diag.constraint_name
-                if constraint_name == 'ix_client_email':
+                if constraint_name == 'ix_clients_email':
                     raise ValueError("Adresse email déjà utilisée.") from e
-                elif constraint_name == 'ix_client_phone':
-                    raise ValueError("Numéro de téléphone déjà utilisé.") from e
+                # elif constraint_name == 'ix_client_phone':
+                #     raise ValueError("Numéro de téléphone déjà utilisé.") from e
                 else:
                     raise ValueError("Erreur de contrainte unique non gérée.") from e
             else:
                 # Remonter l'exception pour les autres erreurs d'intégrité
                 raise Exception("Erreur d'intégrité non gérée.") from e
+
+   
+       
     
     def get_client_by_id(self, client_id: int):
         """
