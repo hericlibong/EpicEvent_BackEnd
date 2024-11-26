@@ -62,7 +62,22 @@ def create(user_data):
     client_controller.close()
 
     if event:
-        click.echo(f"Evènement créé avec succès : ID {event.id}")
+
+        console = Console()
+        table = Table(title="Evènement créé avec succès", show_header=False)
+
+        table.add_column("champ", style="bold cyan")
+        table.add_column("valeur", style="bold magenta")
+
+        table.add_row("ID", str(event.id))
+        table.add_row("Numéro de contrat", str(event.contract_id))
+        table.add_row("Date de début", event.event_date_start.strftime("%d/%m/%Y %H:%M"))
+        table.add_row("Date de fin", event.event_date_end.strftime("%d/%m/%Y %H:%M"))
+        table.add_row("Lieu", event.location)
+        table.add_row("Nombre de participants", str(event.attendees))
+        table.add_row("Notes", event.notes)
+        console.print(table)
+        
     else:
         click.echo("Erreur lors de la création de l'évènement.")
 
@@ -112,7 +127,7 @@ def update(user_data):
 
 @events.command()
 @require_permission('can_assign_support')
-def assign_support(): # Pourquoi user_data en argument alors qu'il n'est pas appelé?
+def assign_support(user_data): # Pourquoi user_data en argument alors qu'il n'est pas appelé?
     """
     Assigner un contact support à un événement.
     """

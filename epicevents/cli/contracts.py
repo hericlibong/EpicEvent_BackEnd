@@ -42,7 +42,20 @@ def create(user_data):
     contract_controller.close()
 
     if contract:
-        click.echo(f"Contrat créé avec succès : ID {contract.id}")
+
+        console = Console()
+        table = Table(title="Contrat créé avec succès", show_header=False)
+
+        table.add_column("champ", style="bold cyan")
+        table.add_column("valeur", style="bold magenta")
+
+        table.add_row("ID", str(contract.id))
+        table.add_row("Client", contract.client.fullname)
+        table.add_row("Montant total", str(contract.amount))
+        table.add_row("Montant restant", str(contract.remaining_amount))
+        table.add_row("Commercial", contract.sales_contact.fullname)
+        console.print(table)
+        
     else:
         click.echo("Erreur lors de la création du contrat.")
 

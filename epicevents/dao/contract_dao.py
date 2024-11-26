@@ -10,8 +10,13 @@ class ContractDAO(BaseDAO):
         """
         contract = Contract(**contract_data)
         self.session.add(contract)
+
         self.session.commit()
-        self.session.refresh(contract)
+        contract = self.session.query(Contract).options(
+            joinedload(Contract.client), 
+            joinedload(Contract.sales_contact)).filter_by(id=contract.id).one()
+        self.session.expunge(contract)
+        # self.session.refresh(contract)
         return contract
     
     def get_contract_by_id(self, contract_id: int):
@@ -20,11 +25,6 @@ class ContractDAO(BaseDAO):
         """
         return self.session.query(Contract).filter_by(id=contract_id).first()
     
-    # def get_all_contracts(self):
-    #     """
-    #     Récupère tous les contrats.
-    #     """
-    #     return self.session.query(Contract).all()
     
     def get_all_contracts(self):
         """
