@@ -1,6 +1,8 @@
 from models.client import Client
 from .base_dao import BaseDAO
 from sqlalchemy.orm import joinedload
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
 
 class ClientDAO(BaseDAO):
 
@@ -10,21 +12,38 @@ class ClientDAO(BaseDAO):
         """
         client = Client(**client_data)
         self.session.add(client)
-        self.session.commit()
+        try:
+            self.session.commit()
 
-        # Recharger le client avec les relations nécessaires
-        client = self.session.query(Client).options(
-            joinedload(Client.sales_contact),
-            # Ajoutez d'autres relations que vous souhaitez charger
-        ).filter_by(id=client.id).one()
+            # Recharger le client avec les relations nécessaires
+            client = self.session.query(Client).options(
+                joinedload(Client.sales_contact),
+                # Ajoutez d'autres relations que vous souhaitez charger
+            ).filter_by(id=client.id).one()
 
-        # Détacher l'objet de la session
-        self.session.expunge(client)
+            # Détacher l'objet de la session
+            self.session.expunge(client)
 
-        # Fermer la session si nécessaire
-        # self.session.close()
+            # Fermer la session si nécessaire
+            # self.session.close()
 
-        return client
+            return client
+        
+        except IntegrityError as e:
+            self.session.rollback()
+            # vérifier si l'erreur est une violation de contrainte unique
+            if isinstance(e.orig, UniqueViolation):
+                # Extraire le nom de la contrainte unique
+                constraint_name = e.orig.diag.constraint_name
+                if constraint_name == 'ix_client_email':
+                    raise ValueError("Adresse email déjà utilisée.") from e
+                elif constraint_name == 'ix_client_phone':
+                    raise ValueError("Numéro de téléphone déjà utilisé.") from e
+                else:
+                    raise ValueError("Erreur de contrainte unique non gérée.") from e
+            else:
+                # Remonter l'exception pour les autres erreurs d'intégrité
+                raise Exception("Erreur d'intégrité non gérée.") from e
     
     def get_client_by_id(self, client_id: int):
         """

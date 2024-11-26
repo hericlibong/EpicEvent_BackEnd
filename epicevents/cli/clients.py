@@ -33,26 +33,28 @@ def create(user_data):
 
     # Créer le client via le contrôleur
     client_controller = ClientController()
-    client = client_controller.create_client(client_data)
-    client_controller.close()
+    try:
+        client = client_controller.create_client(client_data)
+        client_controller.close()
 
-    if client:
+        if client:
 
-        console = Console()
-        table = Table(title="Client créé avec succès", show_header=False)
+            console = Console()
+            table = Table(title="Client créé avec succès", show_header=False)
 
-        table.add_column("champ", style="bold cyan")
-        table.add_column("valeur", style="bold magenta")
+            table.add_column("champ", style="bold cyan")
+            table.add_column("valeur", style="bold magenta")
 
-        table.add_row("ID", str(client.id))
-        table.add_row("Nom complet", client.fullname)
-        table.add_row("Email", client.email)
-        table.add_row("Téléphone", client.phone)
-        table.add_row("Entreprise", client.company_name)
-        table.add_row("Commercial", client.sales_contact.fullname)
-        console.print(table)
-
-    else:
+            table.add_row("ID", str(client.id))
+            table.add_row("Nom complet", client.fullname)
+            table.add_row("Email", client.email)
+            table.add_row("Téléphone", client.phone)
+            table.add_row("Entreprise", client.company_name)
+            table.add_row("Commercial", client.sales_contact.fullname)
+            console.print(table)
+    except ValueError as e:
+        click.echo(f"Erreur lors de la création du client : {e}")
+    except Exception as e:
         click.echo("Erreur lors de la création du client.")
 
 @clients.command(name='update-all')

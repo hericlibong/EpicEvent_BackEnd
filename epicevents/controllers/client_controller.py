@@ -22,9 +22,14 @@ class ClientController:
         try:
             client = self.client_dao.create_client(client_data)
             return client
+        except ValueError as e:
+            # Transmettre l'erreur à la couche supérieure
+            raise e
         except Exception as e:
-            print(f"Erreur lors de la création du client : {e}")
-            return None
+            raise Exception("Erreur lors de la création du client") from e
+        finally:
+            self.client_dao.close()
+            
     
     def get_client_by_id(self, client_id):
         """
