@@ -143,10 +143,25 @@ def login(username, password):
     Authentifier un utilisateur et générer un token d'accès.
     """
     controller = UserController()
-    token = controller.login_user(username, password)
+    token, result = controller.login_user(username, password)
     controller.close()
+    
     if token:
-        print(f"Token d'accès généré : {token}")
-        print("Copiez et collez le token pour accéder aux autres commandes.")
+        user = result  # L'objet utilisateur
+        console = Console()
+        table = Table(title="Authentification réussie !!", show_header=False)
+    
+        table.add_column("Champ", style="bold cyan")
+        table.add_column("Valeur", style="bold magenta")
+    
+        table.add_row("ID utilisateur", str(user.id))
+        table.add_row("Nom d'utilisateur", user.username)
+        table.add_row("Département", user.department.name)
+        
+    
+        console.print(table)
+        click.echo(f"Token d'accès : {token}")
+        click.echo("\nVeuillez conserver ce token pour les prochaines opérations.")
     else:
-        print("Authentification échouée.")
+        # En cas d'échec, afficher le message d'erreur
+        click.echo(f"Erreur lors de l'authentification : {result}")

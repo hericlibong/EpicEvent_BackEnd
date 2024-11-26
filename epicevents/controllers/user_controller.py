@@ -43,12 +43,12 @@ class UserController:
         """
         user = self.user_dao.get_user_by_username(username)
         if not user:
-            print("Utilisateur non trouvé.")
-            return
+            # print("Utilisateur non trouvé.")
+            return None, "Utilisateur non trouvé."
         
         if not verify_password(password, user.hashed_password):
-            print("Mot de passe incorrect.")
-            return
+            # print("Mot de passe incorrect.")
+            return None, "Mot de passe incorrect."
         
         # Générer un token d'accès
         token_data = {
@@ -56,10 +56,10 @@ class UserController:
             'username': user.username,
             'department': user.department.name,
         }
-        print(f"Token data : {token_data}")
+       #  print(f"Token data : {token_data}")
         token = create_access_token(token_data)
-        print(f"Utilisateur authentifié : {user.username}")
-        return token
+        # print(f"Utilisateur authentifié : {user.username}")
+        return token, user
     
     def get_user(self, user_id):
         """
