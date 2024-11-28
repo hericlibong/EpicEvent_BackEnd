@@ -40,6 +40,7 @@ def create(user_data):
         return
     
     # Collecte des informations de l'événement
+    name = click.prompt('Nom de l\'évènement', default='')
     event_date_start = click.prompt('Date de début de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
     event_date_end = click.prompt('Date de fin de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
     location = click.prompt('Lieu de l\'évènement', default='')
@@ -47,6 +48,7 @@ def create(user_data):
     notes = click.prompt('Notes supplémentaires', default='')
 
     event_data = {
+        'name': name,
         'contract_id': signed_contracts[0].id,  # Utiliser le premier contrat signé
         'event_date_start': event_date_start,
         'event_date_end': event_date_end,
@@ -70,6 +72,7 @@ def create(user_data):
         table.add_column("valeur", style="bold magenta")
 
         table.add_row("ID", str(event.id))
+        table.add_row("Nom de l'évènement", event.name)
         table.add_row("Numéro de contrat", str(event.contract_id))
         table.add_row("Date de début", event.event_date_start.strftime("%d/%m/%Y %H:%M"))
         table.add_row("Date de fin", event.event_date_end.strftime("%d/%m/%Y %H:%M"))
@@ -101,6 +104,7 @@ def update(user_data):
         return
     
     # Collecte les nouvelles informations de l'évènement pour la mise à jour
+    name = click.prompt('Nouveau nom de l\'évènement', default=event.name)
     event_date_start = click.prompt('Nouvelle date de début de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
     event_date_end = click.prompt('Nouvelle date de fin de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
     location = click.prompt('Nouveau lieu de l\'évènement', default=event.location)
@@ -108,6 +112,7 @@ def update(user_data):
     notes = click.prompt('Nouvelles notes supplémentaires', default=event.notes)
 
     event_data = {
+        'name': name,
         'event_date_start': event_date_start,
         'event_date_end': event_date_end,
         'location': location,
@@ -186,6 +191,7 @@ def list_filtered_events(user_data, no_support):
         show_lines=True,
         header_style="bold magenta")
     table.add_column("ID", style="dim")
+    table.add_column("Nom de l'événement")
     table.add_column("Numéro de contrat")
     table.add_column("Nom du client")
     table.add_column("Contact client", width=25)
@@ -201,6 +207,7 @@ def list_filtered_events(user_data, no_support):
     for event in events:
         table.add_row(
             str(event.id),
+            event.name or "N/A",
             str(event.contract_id),
             event.contract.client.fullname if event.contract and event.contract.client else "Non défini",
             (f"Email:{event.contract.client.email or 'N/A'} | tel:{event.contract.client.phone or 'N/A'}"
@@ -244,6 +251,7 @@ def list_all_events():
         show_lines=True,
         header_style="bold magenta")
     table.add_column("ID", style="dim")
+    table.add_column("Nom de l'événement")
     table.add_column("Numéro de contrat")
     table.add_column("Nom du client")
     table.add_column("Contact client", width=25)
@@ -259,6 +267,7 @@ def list_all_events():
     for event in events:
         table.add_row(
             str(event.id),
+            event.name or "N/A",
             str(event.contract_id),
             event.contract.client.fullname if event.contract and event.contract.client else "Non défini",
             (f"Email:{event.contract.client.email or 'N/A'} | tel:{event.contract.client.phone or 'N/A'}"

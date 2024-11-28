@@ -7,6 +7,7 @@ class Event(Base):
     __tablename__ = 'events'
 
     id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
     contract_id = Column(Integer, ForeignKey('contracts.id'), nullable=False)
     support_contact_id = Column(Integer, ForeignKey('users.id'))
     event_date_start = Column(DateTime, nullable=False)

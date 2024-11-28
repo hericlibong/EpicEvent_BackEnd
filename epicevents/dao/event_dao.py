@@ -52,12 +52,6 @@ class EventDAO(BaseDAO):
             self.session.refresh(event)
             return event
         return None
-    
-    # def get_events_by_support(self, support_user_id):
-    #     """
-    #     Récupère tous les événements d'un contact de support.
-    #     """
-    #     return self.session.query(Event).filter_by(support_contact_id=support_user_id).all()
 
     def get_events_by_support(self, support_user_id):
         return self.session.query(Event).options(
