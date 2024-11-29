@@ -1,9 +1,9 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models.base import Base
+from epicevents.models.base import Base
 from models.client import Client
-from models.user import User
+from epicevents.models.user import User
 from models.department import Department
 from models.contract import Contract
 from sqlalchemy.exc import IntegrityError
