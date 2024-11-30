@@ -2,53 +2,50 @@ import pytest
 import os
 import sys
 
-# Définir la variable d'environnement pour utiliser une base de données en mémoire
+# Configuration de l'environnement de test
+os.environ['TESTING'] = 'True'
 os.environ['DATABASE_URL'] = 'sqlite:///:memory:'
 
 import config
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.exc import IntegrityError
 from models.base import Base
-from models.department import Department
 from models.user import User
+from models.department import Department
+from models.client import Client
+from models.contract import Contract
+from models.event import Event
 from dao.user_dao import UserDAO
 
-@pytest.fixture(scope='session')
-def test_engine():
-    """Crée un moteur de base de données de test"""
-    engine = create_engine('sqlite:///:memory:', echo=False)
-    
-    # Créer toutes les tables
-    Base.metadata.create_all(bind=engine)
-    
-    return engine
+# Configuration de la base de données de test
+engine = create_engine('sqlite:///:memory:', echo=True)
+TestSession = sessionmaker(bind=engine)
 
-@pytest.fixture(scope='session')
-def TestSessionLocal(test_engine):
-    """Crée une factory de session de test"""
-    return sessionmaker(autocommit=False, autoflush=False, bind=test_engine)
+@pytest.fixture(scope='module', autouse=True)
+def setup_database():
+    """Configure la base de données de test"""
+    Base.metadata.create_all(bind=engine)
+    yield
+    Base.metadata.drop_all(bind=engine)
 
 @pytest.fixture(scope='function')
-def session(TestSessionLocal):
-    """Fournit une session de test avec gestion des transactions"""
-    connection = TestSessionLocal().get_bind().connect()
-    transaction = connection.begin()
-    session = TestSessionLocal(bind=connection)
-    
-    yield session
-    
-    session.close()
-    transaction.rollback()
-    connection.close()
+def session():
+    """Fournit une session de test"""
+    session = TestSession()
+    try:
+        yield session
+    finally:
+        session.close()
 
 @pytest.fixture(scope='function')
 def user_dao(session, monkeypatch):
-    """Fournit un UserDAO configuré pour utiliser la session de test"""
+    """Configure le DAO pour utiliser la session de test"""
     def get_test_session():
         return session
     monkeypatch.setattr(config, 'SessionLocal', get_test_session)
-    return UserDAO()
+    dao = UserDAO()
+    yield dao
+    session.rollback()
 
 @pytest.fixture(scope='function')
 def department(session):
@@ -59,7 +56,7 @@ def department(session):
     return dept
 
 def test_create_user(user_dao, department):
-    """Teste la création d'un utilisateur"""
+    """Test de la création d'un utilisateur"""
     user_data = {
         'username': 'test2user',
         'hashed_password': 'hashedpassword',
@@ -76,5 +73,3 @@ def test_create_user(user_dao, department):
     retrieved_user = user_dao.get_user_by_username('test2user')
     assert retrieved_user is not None
     assert retrieved_user.email == 'testuser2@example.com'
-
-# Les autres tests restent identiques...
