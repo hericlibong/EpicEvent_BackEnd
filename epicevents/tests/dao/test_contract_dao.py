@@ -133,3 +133,112 @@ def test_delete_contract(contract_dao, session, sample_client_and_sales_contact)
     is_deleted = contract_dao.delete_contract(contract.id)
     assert is_deleted
     assert contract_dao.get_contract_by_id(contract.id) is None
+
+# Teste la mise à jour d'un contrat et le comportement avec un ID inexistant
+def test_update_contract_new(contract_dao, session, sample_client_and_sales_contact):
+    """
+    Teste la mise à jour d'un contrat et le comportement avec un ID inexistant.
+    """
+    client, sales_contact = sample_client_and_sales_contact
+    # Créer un contrat
+    contract = Contract(client_id=client.id,
+                        sales_contact_id=sales_contact.id,
+                        status=True,
+                        amount=10000.0,
+                        remaining_amount=5000.0)
+    session.add(contract)
+    session.commit()
+
+    # Mettre à jour le contrat
+    updated_data = {"status": False, "remaining_amount": 2500.0}
+    updated_contract = contract_dao.update_contract(contract.id, updated_data)
+
+    # Vérifier les mises à jour
+    assert updated_contract.status is False
+    assert updated_contract.remaining_amount == 2500.0
+
+    # Tester un ID de contrat inexistant
+    non_existent_update = contract_dao.update_contract(9999, updated_data)
+    assert non_existent_update is None
+
+# Teste la récupération de tous les contrats associés à un client
+def test_get_contracts_by_client_id(contract_dao, session, sample_client_and_sales_contact):
+    """
+    Test the get_contracts_by_client_id method to retrieve contracts by client ID.
+    """
+    client, sales_contact = sample_client_and_sales_contact
+
+    # Créer plusieurs contrats
+    contract1 = Contract(client_id=client.id,
+                         sales_contact_id=sales_contact.id,
+                         status=True,
+                         amount=10000.0,
+                         remaining_amount=5000.0)
+    contract2 = Contract(client_id=client.id,
+                         sales_contact_id=sales_contact.id,
+                         status=False,
+                         amount=20000.0,
+                         remaining_amount=15000.0)
+    session.add_all([contract1, contract2])
+    session.commit()
+
+    # Tester la récupération
+    contracts = contract_dao.get_contracts_by_client_id(client.id)
+    assert len(contracts) == 2
+    assert all(contract.client_id == client.id for contract in contracts)
+
+# Teste la suppression d'un contrat et le comportement avec un ID inexistant
+def test_delete_contract_new(contract_dao, session, sample_client_and_sales_contact):
+    """
+    Test the delete_contract method for removing a contract and handling non-existing IDs.
+    """
+    client, sales_contact = sample_client_and_sales_contact
+
+    # Créer un contrat
+    contract = Contract(client_id=client.id,
+                        sales_contact_id=sales_contact.id,
+                        status=True,
+                        amount=10000.0,
+                        remaining_amount=5000.0)
+    session.add(contract)
+    session.commit()
+
+    # Tester la suppression valide
+    delete_success = contract_dao.delete_contract(contract.id)
+    assert delete_success is True
+    assert contract_dao.get_contract_by_id(contract.id) is None
+
+    # Tester une suppression avec un ID inexistant
+    delete_invalid = contract_dao.delete_contract(9999)
+    assert delete_invalid is False
+
+# Teste la récupération de tous les contrats associés à un contact commercial
+def test_get_contract_by_sales_contact(contract_dao, session, sample_client_and_sales_contact):
+    """
+    Test the get_contract_by_sales_contact method to retrieve all contracts by sales contact ID.
+    """
+    client, sales_contact = sample_client_and_sales_contact
+
+    # Créer plusieurs contrats
+    contract1 = Contract(client_id=client.id,
+                         sales_contact_id=sales_contact.id,
+                         status=True,
+                         amount=10000.0,
+                         remaining_amount=5000.0)
+    contract2 = Contract(client_id=client.id,
+                         sales_contact_id=sales_contact.id,
+                         status=False,
+                         amount=20000.0,
+                         remaining_amount=15000.0)
+    session.add_all([contract1, contract2])
+    session.commit()
+
+    # Tester la récupération des contrats par contact commercial
+    contracts = contract_dao.get_contract_by_sales_contact(sales_contact.id)
+    assert len(contracts) == 2
+    assert all(contract.sales_contact_id == sales_contact.id for contract in contracts)
+    assert contracts[0].client.fullname == "Test Client"  # Vérifie la relation avec le client
+
+
+
+
