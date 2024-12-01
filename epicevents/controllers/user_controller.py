@@ -78,7 +78,7 @@ class UserController:
         users = self.user_dao.get_all_users()
         if not users:
             print("Aucun utilisateur trouvé.")
-            return
+            return []
         return users
     
     def update_user(self, user_id, user_data):
