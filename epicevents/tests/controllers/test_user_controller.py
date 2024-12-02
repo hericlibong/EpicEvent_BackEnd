@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from utils.security import hash_password, create_access_token, verify_password, verify_access_token
 from controllers.user_controller import UserController
 from models.user import User
@@ -57,12 +57,14 @@ def test_register_user_existing_email(user_controller, mock_user_dao):
     user = user_controller.register_user(user_data)
     assert user is None
 
-
 # Teste l'échec à cause d'un département manquant
 def test_register_user_missing_department(user_controller, mock_user_dao):
     mock_user_dao.get_user_by_username.return_value = None
     mock_user_dao.get_user_by_email.return_value = None
-    user_data = {"username": "newuser", "password": "password", "email": "test@example.com"}
+    user_data = {"username": "newuser", 
+                 "password": "password", 
+                 "email": "test@example.com"
+            }
     user = user_controller.register_user(user_data)
     assert user is None
 
@@ -155,11 +157,45 @@ def test_verify_token_invalid(user_controller):
     result = user_controller.verify_token(invalid_token)
     assert result is None
 
+def test_verify_token_valid(user_controller):
+    # Données utilisateur simulées
+    token_data = {"user_id": 1, "username": "testuser", "department": "Test Department"}
+
+    # Mock de verify_access_token
+    with patch("controllers.user_controller.verify_access_token", return_value=token_data):
+        result = user_controller.verify_token("valid_token")
+        assert result == token_data
+
+def test_verify_token_invalid(user_controller):
+    # Mock de verify_access_token pour lever une exception
+    with patch("controllers.user_controller.verify_access_token", side_effect=Exception("Invalid token")):
+        result = user_controller.verify_token("invalid_token")
+        assert result is None
+
+def test_register_user_existing_email(user_controller, mock_user_dao):
+    """
+    Teste l'échec d'enregistrement lorsqu'un email est déjà utilisé.
+    """
+    # Simule un utilisateur inexistant pour le username
+    mock_user_dao.get_user_by_username.return_value = None
+
+    # Simule un utilisateur existant pour l'email
+    mock_user_dao.get_user_by_email.return_value = User(email="existing@example.com")
+
+    # Données utilisateur de test
+    user_data = {
+        "username": "newuser",
+        "password": "password",
+        "email": "existing@example.com",
+        "department_id": 1
+    }
+    # Appelle la méthode et vérifie le retour
+    user = user_controller.register_user(user_data)
+    assert user is None
 
 # Teste la fermeture de session
 def test_close_user_controller(user_controller, mock_user_dao):
     # Appeler la méthode close
     user_controller.close()
-
     # Vérifier que mock_user_dao.close a été appelé
     mock_user_dao.close.assert_called_once()
