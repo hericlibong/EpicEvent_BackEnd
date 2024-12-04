@@ -1,4 +1,5 @@
 import click
+import sentry_sdk
 from controllers.user_controller import UserController
 from models import Department
 from config import SessionLocal
@@ -17,38 +18,47 @@ def list(user_data):
     """
     Lister tous les utilisateurs.
     """
-    controller = UserController()
-    users = controller.get_users_list()
-    controller.close()
+    try:
+        controller = UserController()
+        users = controller.get_users_list()
+        controller.close()
 
-    if not users:
-        click.echo("Aucun utilisateur trouvé.")
-        return
+        if not users:
+            click.echo("Aucun utilisateur trouvé.")
+            return
 
-    console = Console()
-    table = Table(title="[bold cyan]Liste des utilisateurs[/]",
-                  show_header=True,
-                  show_lines=True,
-                  header_style="bold magenta")
-    table.add_column("ID", style="dim")
-    table.add_column("Nom d'utilisateur")
-    table.add_column("Nom complet")
-    table.add_column("Email")
-    table.add_column("Téléphone")
-    table.add_column("Département")
+        console = Console()
+        table = Table(title="[bold cyan]Liste des utilisateurs[/]",
+                    show_header=True,
+                    show_lines=True,
+                    header_style="bold magenta")
+        table.add_column("ID", style="dim")
+        table.add_column("Nom d'utilisateur")
+        table.add_column("Nom complet")
+        table.add_column("Email")
+        table.add_column("Téléphone")
+        table.add_column("Département")
 
-    for user in users:
-        table.add_row(
-            str(user.id),
-            user.username,
-            user.fullname,
-            user.email,
-            user.phone,
-            user.department.name
-        )
-    console.print(table)
+        for user in users:
+            table.add_row(
+                str(user.id),
+                user.username,
+                user.fullname,
+                user.email,
+                user.phone,
+                user.department.name
+            )
+        console.print(table)
+        # sentry_sdk.capture_message("Liste des utilisateurs affichée avec succès.", level="info")
+        return "Success"
+        
+    except Exception as e:
+        # Capture de l'exception avec Sentry
+        sentry_sdk.capture_exception(e)
+        click.echo("Une erreur inattendue est survenue.")
+        return e
+
    
-
 @users.command()
 @require_permission('can_manage_users')
 def create(user_data):
@@ -66,7 +76,6 @@ def create(user_data):
     session = SessionLocal()
 
     try:
-        
         # Sélection du département
         departments = session.query(Department).all()
         if not departments:
@@ -95,6 +104,8 @@ def create(user_data):
         try:
             user = controller.register_user(user_data) # Vérifier l'argument de la fonction
             if user:
+                # Journaliser la création de l'utilisateur
+                sentry_sdk.capture_message(f"Utilisateur créé : {user.username}", level="info")
                 click.echo(f"Utilisateur créé avec succès : {user.username}")
                 console = Console()
                 table = Table(title="Utilisateur créé avec succès", show_header=False)
@@ -109,7 +120,9 @@ def create(user_data):
                 console.print(table)
             else:
                 click.echo("Erreur lors de la création de l'utilisateur.")
-        except ValueError as e:
+        except Exception as e:   # Pourquoi pas ValueError?
+            # Capture des erreurs inattendues
+            sentry_sdk.capture_exception(e)
             click.echo(f"Erreur : {e}")
         finally:
             controller.close()
@@ -118,20 +131,27 @@ def create(user_data):
 
 @users.command()
 @require_permission('can_manage_users')
-def delete():
+def delete(user_data):
     """
     Supprimer un utilisateur avec l'ID fourni.
     """
     user_id = click.prompt('ID de l\'utilisateur à supprimer', type=int)
+    try:
+        controller = UserController()
+        success = controller.delete_user(user_id)
+        controller.close()
 
-    controller = UserController()
-    success = controller.delete_user(user_id)
-    controller.close()
-
-    if success:
-        click.echo(f"Utilisateur ID {user_id} supprimé avec succès.")
-    else:
-        click.echo("Erreur lors de la suppression de l'utilisateur.")
+        if success:
+            # Journaliser la suppression de l'utilisateur
+            sentry_sdk.capture_message(f"Utilisateur supprimé : {user_id}", level="info")
+            click.echo(f"Utilisateur ID {user_id} : supprimé avec succès.")
+        
+        else:
+            click.echo(f"Erreur : Utilisateur ID {user_id} introuvable ou non supprime*é.")
+    except Exception as e:
+        # Capture de l'exception avec Sentry
+        sentry_sdk.capture_exception(e)
+        click.echo(f"Erreur inattendue : {e}")
 
 
 
@@ -142,26 +162,96 @@ def login(username, password):
     """
     Authentifier un utilisateur et générer un token d'accès.
     """
-    controller = UserController()
-    token, result = controller.login_user(username, password)
-    controller.close()
-    
-    if token:
-        user = result  # L'objet utilisateur
-        console = Console()
-        table = Table(title="Authentification réussie !!", show_header=False)
-    
-        table.add_column("Champ", style="bold cyan")
-        table.add_column("Valeur", style="bold magenta")
-    
-        table.add_row("ID utilisateur", str(user.id))
-        table.add_row("Nom d'utilisateur", user.username)
-        table.add_row("Département", user.department.name)
+    try:
+        controller = UserController()
+        token, result = controller.login_user(username, password)
+        controller.close()
         
+        if token:
+            sentry_sdk.capture_message(f"Authentification réussie : {username}", level="info")
+            user = result  # L'objet utilisateur
+            console = Console()
+            table = Table(title="Authentification réussie !!", show_header=False)
+            table.add_column("Champ", style="bold cyan")
+            table.add_column("Valeur", style="bold magenta")
+            table.add_row("ID utilisateur", str(user.id))
+            table.add_row("Nom d'utilisateur", user.username)
+            table.add_row("Département", user.department.name)
+            console.print(table)
+            click.echo(f"Token d'accès : {token}")
+            click.echo("\nVeuillez conserver ce token pour les prochaines opérations.")
+        else:
+            # En cas d'échec, afficher le message d'erreur
+            click.echo(f"Erreur lors de l'authentification : {result}")
+    except Exception as e:
+        sentry_sdk.capture_exception(e)
+        click.echo(f"Erreur : {e}")
+
+@users.command(name='update-users')
+@require_permission('can_manage_users')
+def update(user_data):
+    """
+    Mettre à jour un utilisateur avec les données fournies.
+    """
+    user_id = click.prompt('ID de l\'utilisateur à mettre à jour', type=int)
+
+    # Demander les informations de l'utilisateur
+    updates = {}
+    if click.confirm('Voulez-vous mettre à jour le nom d\'utilisateur ?'):
+        updates['username'] = click.prompt('Nom d\'utilisateur')
+    if click.confirm('Voulez-vous mettre lemots de passe ?'):
+        updates['password'] = click.prompt('Mot de passe', hide_input=True, confirmation_prompt=True)
+    if click.confirm('Voulez-vous mettre  le nom complet ?'):
+        updates['fullname'] = click.prompt('Nouveau nom complet', default='')
+    if click.confirm('Voulez-vous mettre à jour l\'adresse email ?'):
+        updates['email'] = click.prompt('Nouvelle adresse email', default='')
+    if click.confirm('Voulez-vous mettre    le numéro de téléphone ?'):
+        updates['phone'] = click.prompt('Nouveau numéro de téléphone', default='')
+    if click.confirm('Voulez-vous mettre le département ?'):
+        session = SessionLocal()
+        try:
+            departments = session.query(Department).all()
+            if not departments:
+                click.echo("Aucun département disponible.")
+                # session.close()
+                return
+            dept_choices = {str(dept.id): dept.name for dept in departments}
+            click.echo('Départements disponibles :')
+            for dept_id, dept_name in dept_choices.items():
+                click.echo(f"{dept_id}. {dept_name}")
+            department_id = click.prompt('Sélectionnez un département', type=click.Choice(dept_choices.keys()))
+            updates['department_id'] = int(department_id)
+        finally:
+            session.close()
+    # Vérifier si des mises à jour ont été demandées
+    if not updates:
+        click.echo("Aucune mise à jour demandée.")
+        return
     
-        console.print(table)
-        click.echo(f"Token d'accès : {token}")
-        click.echo("\nVeuillez conserver ce token pour les prochaines opérations.")
-    else:
-        # En cas d'échec, afficher le message d'erreur
-        click.echo(f"Erreur lors de l'authentification : {result}")
+    # Mettre à jour l'utilisateur via le contrôleur
+    try:
+        controller = UserController()
+        user = controller.update_user(user_id, updates)
+        controller.close()
+
+        if user:
+            # Journaliser la mise à jour de l'utilisateur
+            sentry_sdk.capture_message(f"Utilisateur mis à jour : {user.username}", level="info")
+            click.echo(f"Utilisateur mis à jour avec succès : {user.username}")
+            console = Console()
+            table = Table(title="Utilisateur mis à jour avec succès", show_header=False)
+            table.add_column("champ", style="bold cyan")
+            table.add_column("valeur", style="bold magenta")
+            table.add_row("ID", str(user.id))
+            table.add_row("Nom d'utilisateur", user.username)
+            table.add_row("Nom complet", user.fullname) 
+            table.add_row("Email", user.email)
+            table.add_row("Téléphone", user.phone)
+            table.add_row("Département", user.department.name)
+            console.print(table)
+        else:
+            click.echo("Erreur lors de la mise à jour de l'utilisateur.")
+    except Exception as e:
+        # Capture des erreurs inattendues
+        sentry_sdk.capture_exception(e)
+        click.echo(f"Erreur : {e}")

@@ -17,12 +17,13 @@ def cli():
     """Interface en ligne de commande pour Epic Events."""
     pass
 
-@cli.resultcallback()
+@cli.result_callback()
 def process_result(result, **kwargs):
     """Capture globale des exceptions inattendues."""
     try:
-        if result is None:
-            raise RuntimeError("Erreur inattendue globale.")
+        # Vérifier si une exception réelle est remontée
+        if isinstance(result, Exception):
+            raise result
     except Exception as e:
         sentry_sdk.capture_exception(e)
         click.echo("Une erreur inattendue a été capturée.")

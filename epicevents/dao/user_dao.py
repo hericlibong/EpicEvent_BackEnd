@@ -1,6 +1,7 @@
 from models.user import User
 from .base_dao import BaseDAO
 from sqlalchemy.orm import joinedload
+import sentry_sdk
 
 class UserDAO(BaseDAO):
     
@@ -34,11 +35,6 @@ class UserDAO(BaseDAO):
         """
         return self.session.query(User).filter_by(id=user_id).first()
     
-    # def get_all_users(self) -> list[User]:
-    #     """
-    #     Récupère tous les utilisateurs.
-    #     """
-    #     return self.session.query(User).all()
 
     def get_all_users(self):
         """
@@ -55,6 +51,18 @@ class UserDAO(BaseDAO):
         return self.session.query(User).filter_by(email=email).first()
     
     
+    # def update_user(self, user_id: int, user_data: dict) -> User:
+    #     """
+    #     Met à jour un utilisateur avec les données fournies.
+    #     """
+    #     user = self.get_user_by_id(user_id)
+    #     if not user:
+    #         return None
+    #     for key, value in user_data.items():
+    #         setattr(user, key, value)
+    #     self.session.commit()
+    #     self.session.refresh(user)
+    #     return user
     def update_user(self, user_id: int, user_data: dict) -> User:
         """
         Met à jour un utilisateur avec les données fournies.
@@ -65,16 +73,28 @@ class UserDAO(BaseDAO):
         for key, value in user_data.items():
             setattr(user, key, value)
         self.session.commit()
-        self.session.refresh(user)
+        # Recharger l'utilisateur avec les relations nécessaires
+        user = self.session.query(User).options(
+            joinedload(User.department)
+        ).filter_by(id=user.id).one()
+
+        # Détacher l'objet de la session
+        self.session.expunge(user)
         return user
     
+
     def delete_user(self, user_id: int) -> bool:
         """
         Supprime un utilisateur par son identifiant.
         """
-        user = self.get_user_by_id(user_id)
-        if not user:
+        try:
+            user = self.get_user_by_id(user_id)
+            if not user:
+                return False # Retourner explicitement False si l'utilisateur n'existe pas
+            self.session.delete(user)
+            self.session.commit()
+            return True # Retourner explicitement True si la suppression a réussi
+        except Exception as e:
+            # Journaliser l'excpetion avec Sentry
+            sentry_sdk.capture_exception(e)
             return False
-        self.session.delete(user)
-        self.session.commit()
-        return True

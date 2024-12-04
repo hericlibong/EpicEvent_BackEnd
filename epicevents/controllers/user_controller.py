@@ -1,6 +1,6 @@
 from dao.user_dao import UserDAO
 from utils.security import hash_password, create_access_token, verify_password, verify_access_token
-
+import sentry_sdk
 
 class UserController:
     def __init__(self):
@@ -96,11 +96,13 @@ class UserController:
         """
         Supprimer un utilisateur par son identifiant.
         """
-        result = self.user_dao.delete_user(user_id)
-        if not result:
-            print("Utilisateur non trouvé.")
-            return
-        print("Utilisateur supprimé avec succès.")
+        try:
+            result = self.user_dao.delete_user(user_id)
+            return result # Retourner expliccitement True ou False
+        except Exception as e:
+            # Journaliser l'excpetion avec Sentry
+            sentry_sdk.capture_exception(e)
+            return False
 
     def verify_token(self, token):
         """
