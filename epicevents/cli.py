@@ -1,11 +1,30 @@
 import click
 import sentry_sdk
+import os
+import logging
+from sentry_sdk.integrations.logging import LoggingIntegration
+from utils.logger import log_info, log_error, get_logger
+from dotenv import load_dotenv
 
-# Initialiser Sentry
+
+# Charger les variables d'environnement depuis le fichier .env
+load_dotenv()
+
+# Initaliser Sentry avec le DSN depuis la variable d'environnement
 sentry_sdk.init(
-    dsn="https://7f8ea82782f16c67853ab71054b6a3cd@o4508367841263616.ingest.de.sentry.io/4508367972794448",
-    traces_sample_rate=1.0  # Capture 100% des traces (peut être ajusté)
+    dsn=os.getenv("SENTRY_DSN"),
+    integrations=[
+        LoggingIntegration(
+            level=logging.INFO, 
+            event_level=logging.ERROR
+            )
+    ],
+    traces_sample_rate=1.0,  # Capture 100% des traces (peut être ajusté)
+    environment=os.getenv("ENVIRONMENT", "development")  # Environnement de déploiement
 )
+
+# Obtenir un logger spécifique pour ce module
+logger = get_logger('cli')
 
 from cli.users import users
 from cli.clients import clients
@@ -17,6 +36,7 @@ def cli():
     """Interface en ligne de commande pour Epic Events."""
     pass
 
+
 @cli.result_callback()
 def process_result(result, **kwargs):
     """Capture globale des exceptions inattendues."""
@@ -25,8 +45,23 @@ def process_result(result, **kwargs):
         if isinstance(result, Exception):
             raise result
     except Exception as e:
-        sentry_sdk.capture_exception(e)
+        log_error(logger, "Une erreur inattendue a été capturée.", exception=e)
         click.echo("Une erreur inattendue a été capturée.")
+
+@cli.command()
+def sample_command():
+    """Commande d'exemple avec journalisation."""
+    log_info(logger, "Exécution de sample_command")
+    try:
+        # Simuler une opération
+        result = 10 / 2
+        log_info(logger, f"Résultat de la division : {result}")
+    except Exception as e:
+        log_error(logger, "Erreur lors de l'exécution de sample_command", exception=e)
+        raise
+
+
+
 
 # Ajouter les groupes de commandes
 cli.add_command(users)

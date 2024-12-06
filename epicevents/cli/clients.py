@@ -5,6 +5,7 @@ from rich.table import Table
 from controllers.client_controller import ClientController
 from controllers.user_controller import UserController
 from utils.decorators import require_permission
+import sentry_sdk
 
 @click.group()
 def clients():
@@ -28,22 +29,27 @@ def create(user_data):
         'email': email,
         'phone': phone,
         'company_name': company_name,
-        'sales_contact_id': user_data.get('user_id')
+        'sales_contact_id': user_data.get('user_id')  # Identifiant du commercial
     }
 
     # Créer le client via le contrôleur
     client_controller = ClientController()
     try:
-        client = client_controller.create_client(client_data)
-        client_controller.close()
+        client = client_controller.create_client(client_data)  # Appel au contrôleur
 
         if client:
+            # Journaliser le succès dans Sentry
+            sentry_sdk.capture_message(
+                f"Client créé avec succès : {client.fullname} (ID : {client.id})",
+                level="info"
+            )
 
+            # Afficher les informations du client créé
             console = Console()
             table = Table(title="Client créé avec succès", show_header=False)
 
-            table.add_column("champ", style="bold cyan")
-            table.add_column("valeur", style="bold magenta")
+            table.add_column("Champ", style="bold cyan")
+            table.add_column("Valeur", style="bold magenta")
 
             table.add_row("ID", str(client.id))
             table.add_row("Nom complet", client.fullname)
@@ -52,10 +58,19 @@ def create(user_data):
             table.add_row("Entreprise", client.company_name)
             table.add_row("Commercial", client.sales_contact.fullname)
             console.print(table)
+        else:
+            click.echo("Erreur lors de la création du client.")
+
     except ValueError as e:
+        # Message utilisateur pour une erreur contrôlée
         click.echo(f"Erreur lors de la création du client : {e}")
     except Exception as e:
-        click.echo("Erreur lors de la création du client.")
+        # Journaliser une exception inattendue dans Sentry
+        sentry_sdk.capture_exception(e)
+        click.echo("Une erreur inattendue est survenue lors de la création du client.")
+    finally:
+        client_controller.close()  # Nettoyer les ressources
+
 
 @clients.command(name='update-all')
 @require_permission('can_modify_all_clients')

@@ -1,5 +1,6 @@
 # controllers/client_controller.py
 from dao.client_dao import ClientDAO
+from sentry_sdk import capture_exception, capture_message
 
 class ClientController:
     def __init__(self):
@@ -19,15 +20,37 @@ class ClientController:
         """
         Créer un nouveau client.
         """
+        # Validation des données
+        if not client_data.get('fullname'):
+            raise ValueError("Le nom complet est obligatoire.")
+        if not client_data.get('email'):
+            raise ValueError("L'adresse email est obligatoire.")
+        if not client_data.get('phone'):
+            raise ValueError("Le numéro de téléphone est obligatoire.")
+        if not client_data.get('company_name'):
+            raise ValueError("Le nom de l'entreprise est obligatoire.")
+        
         try:
             client = self.client_dao.create_client(client_data)
+
+            # Journaliser le succès
+            capture_message(
+                f"Client créé avec succès : {client.fullname} (ID : {client.id})",
+                level="info")
             return client
+        
         except ValueError as e:
             # Transmettre l'erreur à la couche supérieure
+            # Journaliser une erreur métier
+            capture_message(f"Erreur métier : {e}", level="warning")
             raise e
+        
         except Exception as e:
+            # Journaliser une erreur inattendue
+            capture_exception(e)
             raise Exception("Erreur lors de la création du client") from e
         finally:
+            # Fermer la session pour libérer les ressources
             self.client_dao.close()
             
     

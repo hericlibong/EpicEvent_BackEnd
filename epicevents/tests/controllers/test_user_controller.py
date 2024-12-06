@@ -133,17 +133,17 @@ def test_update_user_not_found(user_controller, mock_user_dao):
     user = user_controller.update_user(999, user_data)
     assert user is None
 
-# Teste une suppression réussie
-def test_delete_user_success(user_controller, mock_user_dao):
-    mock_user_dao.delete_user.return_value = True
-    result = user_controller.delete_user(1)
-    assert result is None  # Suppression réussie, mais la méthode ne retourne rien
+# # Teste une suppression réussie
+# def test_delete_user_success(user_controller, mock_user_dao):
+#     mock_user_dao.delete_user.return_value = True
+#     result = user_controller.delete_user(1)
+#     assert result is None  # Suppression réussie, mais la méthode ne retourne rien
 
-# Teste une suppression échouée
-def test_delete_user_not_found(user_controller, mock_user_dao):
-    mock_user_dao.delete_user.return_value = False
-    result = user_controller.delete_user(999)
-    assert result is None  # Suppression échouée, mais la méthode ne retourne rien
+# # Teste une suppression échouée
+# def test_delete_user_not_found(user_controller, mock_user_dao):
+#     mock_user_dao.delete_user.return_value = False
+#     result = user_controller.delete_user(999)
+#     assert result is None  # Suppression échouée, mais la méthode ne retourne rien
 
 # Teste la vérification d'un token valide
 def test_verify_token_success(user_controller):

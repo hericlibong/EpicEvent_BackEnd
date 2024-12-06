@@ -6,6 +6,9 @@ from config import SessionLocal
 from rich.table import Table
 from rich.console import Console
 from utils.decorators import require_permission
+from utils.logger import log_info, log_error, get_logger
+
+logger = get_logger('users')
 
 @click.group()
 def users():
@@ -49,12 +52,21 @@ def list(user_data):
                 user.department.name
             )
         console.print(table)
-        # sentry_sdk.capture_message("Liste des utilisateurs affichée avec succès.", level="info")
+        log_info(
+            logger,
+            "Liste des utilisateurs affichée avec succès."
+        )
+        
         return "Success"
         
     except Exception as e:
         # Capture de l'exception avec Sentry
-        sentry_sdk.capture_exception(e)
+        log_error(
+            logger,
+            "Erreur lors de l'affichage de la liste des utilisateurs",
+            exception=e
+        )
+        
         click.echo("Une erreur inattendue est survenue.")
         return e
 
@@ -105,7 +117,14 @@ def create(user_data):
             user = controller.register_user(user_data) # Vérifier l'argument de la fonction
             if user:
                 # Journaliser la création de l'utilisateur
-                sentry_sdk.capture_message(f"Utilisateur créé : {user.username}", level="info")
+                log_info(
+                    logger,
+                    f"Utilisateur créé avec succès : {user.username}",
+                    user_id=user.id,
+                    department = user.department.name
+                )
+                
+                # sentry_sdk.capture_message(f"Utilisateur créé : {user.username}", level="info")
                 click.echo(f"Utilisateur créé avec succès : {user.username}")
                 console = Console()
                 table = Table(title="Utilisateur créé avec succès", show_header=False)
@@ -120,9 +139,15 @@ def create(user_data):
                 console.print(table)
             else:
                 click.echo("Erreur lors de la création de l'utilisateur.")
-        except Exception as e:   # Pourquoi pas ValueError?
+        except Exception as e:   
+            
             # Capture des erreurs inattendues
-            sentry_sdk.capture_exception(e)
+            log_error(
+                logger,
+                "Erreur lors de la création de l'utilisateur",
+                exception=e
+            )
+            # sentry_sdk.capture_exception(e)
             click.echo(f"Erreur : {e}")
         finally:
             controller.close()
@@ -142,15 +167,21 @@ def delete(user_data):
         controller.close()
 
         if success:
-            # Journaliser la suppression de l'utilisateur
-            sentry_sdk.capture_message(f"Utilisateur supprimé : {user_id}", level="info")
+            log_info(
+                logger,
+                f"Utilisateur ID {user_id} : supprimé avec succès."
+            )
             click.echo(f"Utilisateur ID {user_id} : supprimé avec succès.")
         
         else:
             click.echo(f"Erreur : Utilisateur ID {user_id} introuvable ou non supprime*é.")
     except Exception as e:
         # Capture de l'exception avec Sentry
-        sentry_sdk.capture_exception(e)
+        log_error(
+            logger,
+            "Erreur lors de la suppression de l'utilisateur",
+            exception=e
+        )
         click.echo(f"Erreur inattendue : {e}")
 
 
@@ -168,7 +199,13 @@ def login(username, password):
         controller.close()
         
         if token:
-            sentry_sdk.capture_message(f"Authentification réussie : {username}", level="info")
+            log_info(
+                logger,
+                f"Authentification réussie : {username}",
+                user_id=result.id,
+                department=result.department.name
+
+            )
             user = result  # L'objet utilisateur
             console = Console()
             table = Table(title="Authentification réussie !!", show_header=False)
@@ -184,7 +221,12 @@ def login(username, password):
             # En cas d'échec, afficher le message d'erreur
             click.echo(f"Erreur lors de l'authentification : {result}")
     except Exception as e:
-        sentry_sdk.capture_exception(e)
+        log_error(
+            logger,
+            "Erreur lors de l'authentification",
+            exception=e
+        )
+        # sentry_sdk.capture_exception(e)
         click.echo(f"Erreur : {e}")
 
 @users.command(name='update-users')
@@ -236,7 +278,13 @@ def update(user_data):
 
         if user:
             # Journaliser la mise à jour de l'utilisateur
-            sentry_sdk.capture_message(f"Utilisateur mis à jour : {user.username}", level="info")
+            log_info(
+                logger,
+                f"Utilisateur mis à jour : {user.username}",
+                user_id=user.id,
+                department = user.department.name
+            )
+    
             click.echo(f"Utilisateur mis à jour avec succès : {user.username}")
             console = Console()
             table = Table(title="Utilisateur mis à jour avec succès", show_header=False)
@@ -253,5 +301,9 @@ def update(user_data):
             click.echo("Erreur lors de la mise à jour de l'utilisateur.")
     except Exception as e:
         # Capture des erreurs inattendues
-        sentry_sdk.capture_exception(e)
+        log_error(
+            logger,
+            "Erreur lors de la mise à jour de l'utilisateur",
+            exception=e
+        )
         click.echo(f"Erreur : {e}")

@@ -15,6 +15,10 @@ class UserController:
             existing_user = self.user_dao.get_user_by_username(user_data.get('username'))
             if existing_user:
                 raise ValueError("Nom d'utilisateur déjà utilisé.")
+        
+        # Vérifier que l'adresse email est fournie
+            if not user_data.get('email'):
+                raise ValueError("Adresse email non fournie.")
             
         # Vérifier que l'adresse email n'est pas déjà utilisée
             existing_email = self.user_dao.get_user_by_email(user_data.get('email'))
@@ -29,7 +33,8 @@ class UserController:
             # Hasher le mot de passe
             user_data['hashed_password'] = hash_password(user_data.pop('password'))
 
-            # Créer l'utilisateur
+            
+            
             user = self.user_dao.create_user(user_data)
             #print(f"Utilisateur créé avec succès : {user.username}")
             return user

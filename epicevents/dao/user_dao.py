@@ -50,19 +50,6 @@ class UserDAO(BaseDAO):
         """
         return self.session.query(User).filter_by(email=email).first()
     
-    
-    # def update_user(self, user_id: int, user_data: dict) -> User:
-    #     """
-    #     Met à jour un utilisateur avec les données fournies.
-    #     """
-    #     user = self.get_user_by_id(user_id)
-    #     if not user:
-    #         return None
-    #     for key, value in user_data.items():
-    #         setattr(user, key, value)
-    #     self.session.commit()
-    #     self.session.refresh(user)
-    #     return user
     def update_user(self, user_id: int, user_data: dict) -> User:
         """
         Met à jour un utilisateur avec les données fournies.
