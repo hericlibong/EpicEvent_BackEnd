@@ -69,8 +69,7 @@ def list(user_data):
         
         click.echo("Une erreur inattendue est survenue.")
         return e
-
-   
+  
 @users.command()
 @require_permission('can_manage_users')
 def create(user_data):
@@ -123,8 +122,7 @@ def create(user_data):
                     user_id=user.id,
                     department = user.department.name
                 )
-                
-                # sentry_sdk.capture_message(f"Utilisateur créé : {user.username}", level="info")
+            
                 click.echo(f"Utilisateur créé avec succès : {user.username}")
                 console = Console()
                 table = Table(title="Utilisateur créé avec succès", show_header=False)
@@ -147,7 +145,6 @@ def create(user_data):
                 "Erreur lors de la création de l'utilisateur",
                 exception=e
             )
-            # sentry_sdk.capture_exception(e)
             click.echo(f"Erreur : {e}")
         finally:
             controller.close()
@@ -183,7 +180,6 @@ def delete(user_data):
             exception=e
         )
         click.echo(f"Erreur inattendue : {e}")
-
 
 
 @users.command()
@@ -226,7 +222,6 @@ def login(username, password):
             "Erreur lors de l'authentification",
             exception=e
         )
-        # sentry_sdk.capture_exception(e)
         click.echo(f"Erreur : {e}")
 
 @users.command(name='update-users')
@@ -307,3 +302,72 @@ def update(user_data):
             exception=e
         )
         click.echo(f"Erreur : {e}")
+
+
+# Commandes pour tester les exceptions
+# Déclencher une exception intentionnellement pour tester Sentry
+@users.command()
+def test_exception():
+    """Commande pour tester la capture des exceptions par Sentry."""
+    try:
+        controller = UserController()
+        controller.trigger_exception()
+    except Exception as e:
+        click.echo(f"Exception capturée : {e}")
+
+@users.command(name='test-value-error')
+def test_value_exception():
+    """Commande pour tester la capture des exceptions par Sentry."""
+    try:
+        controller = UserController()
+        controller.trigger_value_error()
+    except Exception as e:
+        click.echo(f"Exception capturée : {e}")
+
+@users.command(name='test-key-error')
+def test_key_exception():
+    """Commande pour tester la capture des exceptions par Sentry."""
+    try:
+        controller = UserController()
+        controller.trigger_key_error()
+    except Exception as e:
+        click.echo(f"Exception capturée : {e}")
+
+@users.command(name='test-type-error')
+def test_type_exception():
+    """Commande pour tester la capture des exceptions par Sentry."""
+    try:
+        controller = UserController()
+        controller.trigger_type_error()
+    except Exception as e:
+        click.echo(f"Exception capturée : {e}")
+
+# Déclencher un exception IOError/ OSError pour tester Sentry
+@users.command(name='test-io-error')
+def test_io_exception():
+    """Commande pour tester la capture des exceptions par Sentry."""
+    try:
+        controller = UserController()
+        controller.trigger_io_error()
+    except Exception as e:
+        click.echo(f"Exception capturée : {e}")
+
+# Déclencher une exception AttributeError pour tester Sentry
+@users.command(name='test-attribute-error')
+def test_attribute_exception():
+    """Commande pour tester la capture des exceptions par Sentry."""
+    try:
+        controller = UserController()
+        controller.trigger_attribute_error()
+    except Exception as e:
+        click.echo(f"Exception capturée : {e}")
+
+# Déclencher une exception IndexError pour tester Sentry
+@users.command(name='test-index-error')
+def test_index_exception():
+    """Commande pour tester la capture des exceptions par Sentry."""
+    try:
+        controller = UserController()
+        controller.trigger_index_error()
+    except Exception as e:
+        click.echo(f"Exception capturée : {e}")

@@ -6,6 +6,8 @@ from controllers.user_controller import UserController
 from utils.permissions import has_permission
 import inspect  # Pour inspecter les arguments de la fonction (précision de l'argument 'user_data')
 
+
+# Décorateur pour vérifier les permissions de l'utilisateur
 def require_permission(*permissions):
     def decorator(f):
         @functools.wraps(f)
@@ -43,5 +45,6 @@ def require_permission(*permissions):
             else:
                 return f(user_data, *args, **kwargs)
         return wrapper
-    return decorator            
+    return decorator 
+
 
