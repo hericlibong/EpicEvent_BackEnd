@@ -5,6 +5,7 @@ from models.base import Base
 from models.user import User
 from models.department import Department
 from dao.user_dao import UserDAO
+from unittest.mock import patch
 
 @pytest.fixture(scope="module")
 def test_engine():
@@ -248,10 +249,46 @@ def test_get_user_by_email(user_dao, session, sample_department):
     assert retrieved_user.username == "testuser"
     assert retrieved_user.email == "testuser@example.com"
 
+# Test du logger dans UserDAO
+def test_user_dao_logger_initialization(user_dao):
+    """
+    Teste si le logger est correctement initialisé dans UserDAO.
+    """
+    assert user_dao.logger is not None
+    assert user_dao.logger.name == 'epicevents.dao'
 
 
 
+def test_create_user_exception(user_dao, sample_department):
+    """
+    Teste si une exception lors de la création d'un utilisateur est bien capturée.
+    """
+    with patch.object(user_dao.session, 'commit', side_effect=RuntimeError("Test RuntimeError")):
+        with pytest.raises(RuntimeError) as exc_info:
+            user_dao.create_user({
+                "username": "testuser",
+                "hashed_password": "hashedpassword",
+                "fullname": "Test User",
+                "email": "testuser@example.com",
+                "phone": "1234567890",
+                "department_id": sample_department.id
+            })
+        assert "Test RuntimeError" in str(exc_info.value)
 
+def test_update_user_exception(user_dao, session, sample_department):
+    """
+    Teste si une exception lors de la mise à jour d'un utilisateur est bien capturée.
+    """
+    user = User(username="testuser",
+                hashed_password="hashedpassword",
+                fullname="Test User",
+                email="testuser@example.com",
+                phone="1234567890",
+                department_id=sample_department.id)
+    session.add(user)
+    session.commit()
 
-
-
+    with patch.object(user_dao.session, 'commit', side_effect=ValueError("Test ValueError")):
+        with pytest.raises(ValueError) as exc_info:
+            user_dao.update_user(user.id, {"fullname": "Updated User"})
+        assert "Test ValueError" in str(exc_info.value)

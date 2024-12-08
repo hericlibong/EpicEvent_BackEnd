@@ -34,9 +34,9 @@ class ClientController:
             client = self.client_dao.create_client(client_data)
 
             # Journaliser le succès
-            capture_message(
-                f"Client créé avec succès : {client.fullname} (ID : {client.id})",
-                level="info")
+            # capture_message(
+            #     f"Client créé avec succès : {client.fullname} (ID : {client.id})",
+            #     level="info")
             return client
         
         except ValueError as e:
@@ -90,3 +90,11 @@ class ClientController:
     
     def close(self):
         self.client_dao.close()
+
+    
+    def delete_client(self, client_id):
+        """
+        Supprimer un client par son identifiant.
+        """
+        result = self.client_dao.delete_client(client_id)
+        return result
