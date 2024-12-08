@@ -76,6 +76,31 @@ def test_get_client_by_id(client_dao, session, sample_sales_contact):
     assert retrieved_client is not None
     assert retrieved_client.email == "testclient@example.com"
 
+# Test de la méthode get_client_by_email
+def test_get_client_by_email(client_dao, session, sample_sales_contact):
+    # Création d'un client avec des données de test
+    client = Client(
+        fullname="Test Client",
+        email="testclient@email.com",
+        phone="0987654321",
+        company_name="Test Company",
+        sales_contact_id=sample_sales_contact.id
+    )
+    # Ajout du client à la session et validation
+    session.add(client)
+    session.commit()
+
+    # Utilisation de la méthode DAO pour récupérer le client par email
+    retrieved_client = client_dao.get_client_by_email(client.email)
+    
+    # Assertions pour valider les résultats
+    assert retrieved_client is not None, "Le client n'a pas été trouvé dans la base de données."
+    assert retrieved_client.email == "testclient@email.com", (
+        f"L'email du client récupéré est incorrect : {retrieved_client.email}"
+    )
+
+
+
 def test_get_all_clients(client_dao, session, sample_sales_contact):
     client1 = Client(fullname="Client 1",
                      email="client1@example.com",

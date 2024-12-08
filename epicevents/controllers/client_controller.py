@@ -83,6 +83,3 @@ class ClientController:
     @log_exceptions('controller')
     def close(self):
         self.client_dao.close()
-
-    
-    
