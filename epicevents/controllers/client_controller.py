@@ -1,11 +1,15 @@
 # controllers/client_controller.py
 from dao.client_dao import ClientDAO
-from sentry_sdk import capture_exception, capture_message
+from utils.log_decorator import log_exceptions
+from utils.logger import get_logger
+
 
 class ClientController:
     def __init__(self):
         self.client_dao = ClientDAO()
+        self.logger = get_logger('controller')
 
+    @log_exceptions('controller')
     def get_all_clients(self):
         """
         Récupérer tous les clients.
@@ -16,6 +20,7 @@ class ClientController:
             return
         return clients
     
+    #@log_exceptions('controller')
     def create_client(self, client_data):
         """
         Créer un nouveau client.
@@ -30,30 +35,11 @@ class ClientController:
         if not client_data.get('company_name'):
             raise ValueError("Le nom de l'entreprise est obligatoire.")
         
-        try:
-            client = self.client_dao.create_client(client_data)
-
-            # Journaliser le succès
-            # capture_message(
-            #     f"Client créé avec succès : {client.fullname} (ID : {client.id})",
-            #     level="info")
-            return client
+        client = self.client_dao.create_client(client_data)       
+        return client
         
-        except ValueError as e:
-            # Transmettre l'erreur à la couche supérieure
-            # Journaliser une erreur métier
-            capture_message(f"Erreur métier : {e}", level="warning")
-            raise e
-        
-        except Exception as e:
-            # Journaliser une erreur inattendue
-            capture_exception(e)
-            raise Exception("Erreur lors de la création du client") from e
-        finally:
-            # Fermer la session pour libérer les ressources
-            self.client_dao.close()
             
-    
+    @log_exceptions('controller')
     def get_client_by_id(self, client_id):
         """
         Récupérer un client par son identifiant.
@@ -64,20 +50,18 @@ class ClientController:
             return None
         return client
     
+    @log_exceptions('controller')
     def update_client(self, client_id, client_data):
         """
         Mettre à jour un client.
         """
-        try:
-            client = self.client_dao.update_client(client_id, client_data)
-            if not client:
-                print("Aucun client trouvé ou erreur lors de la mise à jour.")
-                return None
-            return client
-        except Exception as e:
-            print(f"Erreur lors de la mise à jour du client : {e}")
+        client = self.client_dao.update_client(client_id, client_data)
+        if not client:
+            print("Aucun client trouvé ou erreur lors de la mise à jour.")
             return None
-    
+        return client
+              
+    @log_exceptions('controller')
     def get_clients_by_sales_contact(self, sales_contact_id):     
         """
         Récupérer tous les clients d'un contact commercial.
@@ -88,13 +72,17 @@ class ClientController:
             return None
         return clients
     
-    def close(self):
-        self.client_dao.close()
-
-    
+    @log_exceptions('controller')
     def delete_client(self, client_id):
         """
         Supprimer un client par son identifiant.
         """
         result = self.client_dao.delete_client(client_id)
         return result
+    
+    @log_exceptions('controller')
+    def close(self):
+        self.client_dao.close()
+
+    
+    

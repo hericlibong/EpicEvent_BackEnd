@@ -187,7 +187,7 @@ def update_own_client(user_data):
                 f"Client mis à jour avec succès : {updated_client.fullname} (ID : {updated_client.id}),\n"
                 f" Commercial : {user_data['username']})"
             )
-            click.echo(f"Client mis à jour avec succès : {updated_client.fullname}")
+            click.echo(f"Données client : {updated_client.fullname}")
             console = Console()
             table = Table(title="Client mis à jour avec succès", show_header=False)
             table.add_column("Champ", style="bold cyan")
@@ -319,7 +319,7 @@ def list_clients():
     table.add_column("Entreprise")
     table.add_column("Date de création", style="dim")
     table.add_column("Dernière mise à jour", style="dim")
-    table.add_column("Commercial", style="dim")
+    table.add_column("Commercial")
 
     for client in clients:
         table.add_row(
