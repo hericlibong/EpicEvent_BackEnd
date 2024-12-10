@@ -140,11 +140,11 @@ def create(user_data):
         except Exception as e:   
             
             # Capture des erreurs inattendues
-            log_error(
-                logger,
-                "Erreur lors de la création de l'utilisateur",
-                exception=e
-            )
+            # log_error(
+            #     logger,
+            #     "Erreur lors de la création de l'utilisateur",
+            #     exception=e
+            # )
             click.echo(f"Erreur : {e}")
         finally:
             controller.close()

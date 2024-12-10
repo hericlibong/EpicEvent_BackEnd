@@ -7,83 +7,192 @@ from controllers.user_controller import UserController
 from controllers.client_controller import ClientController
 from controllers.contract_controller import ContractController
 from utils.decorators import require_permission
+from utils.logger import get_logger, log_info, log_error
 
 @click.group()
 def events():
     """Commandes pour gérer les événements."""
     pass
 
-@events.command(name ='create-event')
+# @events.command(name ='create-event')
+# @require_permission('can_create_events')
+# def create(user_data):
+#     """
+#     Créer un nouvel évènement
+#     """
+#     client_id = click.prompt('ID du client', type=int)
+
+#     # Vérifier que le client appartient à l'utilisateur
+#     client_controller = ClientController()
+#     client = client_controller.get_client_by_id(client_id)
+#     if client.sales_contact_id != user_data['user_id']:
+#         click.echo("Vous n'êtes pas responsable de ce client.")
+#         client_controller.close()
+#         return
+    
+#     # Vérifier que le client a un contrat signé
+#     contract_controller = ContractController()
+#     contracts = contract_controller.get_contracts_by_client_id(client_id)
+#     signed_contracts = [c for c in contracts if c.status]
+#     if not signed_contracts:
+#         click.echo("Le client n'a pas de contrat signé.")
+#         contract_controller.close()
+#         client_controller.close()
+#         return
+    
+#     # Collecte des informations de l'événement
+#     name = click.prompt('Nom de l\'évènement', default='')
+#     event_date_start = click.prompt('Date de début de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
+#     event_date_end = click.prompt('Date de fin de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
+#     location = click.prompt('Lieu de l\'évènement', default='')
+#     attendees = click.prompt('Nombre de participants', type=int, default=0)
+#     notes = click.prompt('Notes supplémentaires', default='')
+
+#     event_data = {
+#         'name': name,
+#         'contract_id': signed_contracts[0].id,  # Utiliser le premier contrat signé
+#         'event_date_start': event_date_start,
+#         'event_date_end': event_date_end,
+#         'location': location,
+#         'attendees': attendees,
+#         'notes': notes
+#     }
+
+#     event_controller = EventController()
+#     event = event_controller.create_event(event_data)
+#     event_controller.close()
+#     contract_controller.close()
+#     client_controller.close()
+
+#     if event:
+
+#         console = Console()
+#         table = Table(title="Evènement créé avec succès", show_header=False)
+
+#         table.add_column("champ", style="bold cyan")
+#         table.add_column("valeur", style="bold magenta")
+
+#         table.add_row("ID", str(event.id))
+#         table.add_row("Nom de l'évènement", event.name)
+#         table.add_row("Numéro de contrat", str(event.contract_id))
+#         table.add_row("Date de début", event.event_date_start.strftime("%d/%m/%Y %H:%M"))
+#         table.add_row("Date de fin", event.event_date_end.strftime("%d/%m/%Y %H:%M"))
+#         table.add_row("Lieu", event.location)
+#         table.add_row("Nombre de participants", str(event.attendees))
+#         table.add_row("Notes", event.notes)
+#         console.print(table)
+        
+#     else:
+#         click.echo("Erreur lors de la création de l'évènement.")
+
+@events.command(name='create-event')
 @require_permission('can_create_events')
 def create(user_data):
     """
     Créer un nouvel évènement
     """
-    client_id = click.prompt('ID du client', type=int)
-
-    # Vérifier que le client appartient à l'utilisateur
-    client_controller = ClientController()
-    client = client_controller.get_client_by_id(client_id)
-    if client.sales_contact_id != user_data['user_id']:
-        click.echo("Vous n'êtes pas responsable de ce client.")
-        client_controller.close()
-        return
-    
-    # Vérifier que le client a un contrat signé
-    contract_controller = ContractController()
-    contracts = contract_controller.get_contracts_by_client_id(client_id)
-    signed_contracts = [c for c in contracts if c.status]
-    if not signed_contracts:
-        click.echo("Le client n'a pas de contrat signé.")
-        contract_controller.close()
-        client_controller.close()
-        return
-    
-    # Collecte des informations de l'événement
-    name = click.prompt('Nom de l\'évènement', default='')
-    event_date_start = click.prompt('Date de début de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
-    event_date_end = click.prompt('Date de fin de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
-    location = click.prompt('Lieu de l\'évènement', default='')
-    attendees = click.prompt('Nombre de participants', type=int, default=0)
-    notes = click.prompt('Notes supplémentaires', default='')
-
-    event_data = {
-        'name': name,
-        'contract_id': signed_contracts[0].id,  # Utiliser le premier contrat signé
-        'event_date_start': event_date_start,
-        'event_date_end': event_date_end,
-        'location': location,
-        'attendees': attendees,
-        'notes': notes
-    }
+    contract_id = click.prompt('ID du contrat signé', type=int)
 
     event_controller = EventController()
-    event = event_controller.create_event(event_data)
-    event_controller.close()
-    contract_controller.close()
-    client_controller.close()
-
-    if event:
-
-        console = Console()
-        table = Table(title="Evènement créé avec succès", show_header=False)
-
-        table.add_column("champ", style="bold cyan")
-        table.add_column("valeur", style="bold magenta")
-
-        table.add_row("ID", str(event.id))
-        table.add_row("Nom de l'évènement", event.name)
-        table.add_row("Numéro de contrat", str(event.contract_id))
-        table.add_row("Date de début", event.event_date_start.strftime("%d/%m/%Y %H:%M"))
-        table.add_row("Date de fin", event.event_date_end.strftime("%d/%m/%Y %H:%M"))
-        table.add_row("Lieu", event.location)
-        table.add_row("Nombre de participants", str(event.attendees))
-        table.add_row("Notes", event.notes)
-        console.print(table)
+    try:
+        # Le contrôleur vérifiera si le contrat est signé,
+        # si le commercial responsable correspond à l'utilisateur,
+        # si un event existe déjà pour ce contrat,
+        # et validera les dates.
         
-    else:
-        click.echo("Erreur lors de la création de l'évènement.")
+        name = click.prompt('Nom de l\'évènement', default='')
+        event_date_start_str = click.prompt('Date de début (JJ/MM/AAAA HH:MM)', type=str)
+        event_date_end_str = click.prompt('Date de fin (JJ/MM/AAAA HH:MM)', type=str)
+        location = click.prompt('Lieu', default='')
+        attendees = click.prompt('Nombre de participants', type=int, default=0)
+        notes = click.prompt('Notes', default='')
 
+        event_data = {
+            'name': name,
+            'contract_id': contract_id,
+            'event_date_start_str': event_date_start_str,
+            'event_date_end_str': event_date_end_str,
+            'location': location,
+            'attendees': attendees,
+            'notes': notes
+        }
+
+        event = event_controller.create_event(event_data, user_data['user_id'])
+
+        if event:
+            # Journaliser le succès
+            log_info(get_logger('events'), f"Evènement créé avec succès : ID {event.id}")
+            
+            console = Console()
+            table = Table(title="Evènement créé avec succès", show_header=False)
+            table.add_column("champ", style="bold cyan")
+            table.add_column("valeur", style="bold magenta")
+            table.add_row("ID", str(event.id))
+            table.add_row("Nom de l'évènement", event.name)
+            table.add_row("Numéro de contrat", str(event.contract_id))
+            table.add_row("Date de début", event.event_date_start.strftime("%d/%m/%Y %H:%M"))
+            table.add_row("Date de fin", event.event_date_end.strftime("%d/%m/%Y %H:%M"))
+            table.add_row("Lieu", event.location)
+            table.add_row("Nombre de participants", str(event.attendees))
+            table.add_row("Notes", event.notes)
+            console.print(table)
+        else:
+            click.echo("Erreur lors de la création de l'évènement.")
+
+    except ValueError as ve:
+        # Erreur métier
+        click.echo(f"Erreur: {ve}")
+    except Exception as e:
+        # Erreur inattendue
+        log_error(get_logger('events'), f"Erreur inattendue lors de la création de l'évènement : {str(e)}")
+        click.echo("Erreur inattendue lors de la création de l'évènement.")
+
+    event_controller.close()
+
+
+
+# @events.command(name='update-own')
+# @require_permission('can_modify_own_events')
+# def update(user_data):
+#     """
+#     Mettre à jour un évènement dont vous êtes responsable.
+#     """
+
+#     event_id = click.prompt('ID de l\'évènement à mettre à jour', type=int)
+
+#     event_controller = EventController()
+#     event = event_controller.get_event_by_id(event_id)
+    
+#     # Vérifier que l'évènement appartient à l'utilisateur
+#     if event.support_contact_id != user_data['user_id']:
+#         click.echo("Vous n'êtes pas responsable de cet évènement. Vous ne pouvez pas le modifier.")
+#         event_controller.close()
+#         return
+    
+#     # Collecte les nouvelles informations de l'évènement pour la mise à jour
+#     name = click.prompt('Nouveau nom de l\'évènement', default=event.name)
+#     event_date_start = click.prompt('Nouvelle date de début de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
+#     event_date_end = click.prompt('Nouvelle date de fin de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
+#     location = click.prompt('Nouveau lieu de l\'évènement', default=event.location)
+#     attendees = click.prompt('Nouveau nombre de participants', type=int, default=event.attendees)   
+#     notes = click.prompt('Nouvelles notes supplémentaires', default=event.notes)
+
+#     event_data = {
+#         'name': name,
+#         'event_date_start': event_date_start,
+#         'event_date_end': event_date_end,
+#         'location': location,
+#         'attendees': attendees,
+#         'notes': notes
+#     }
+
+#     updated_event = event_controller.update_event(event_id, event_data)
+#     event_controller.close()
+
+#     if updated_event:
+#         click.echo(f"Evènement mis à jour avec succès : ID {updated_event.id}")
+#     else:
+#         click.echo("Erreur lors de la mise à jour de l'évènement.")
 
 @events.command(name='update-own')
 @require_permission('can_modify_own_events')
@@ -91,42 +200,54 @@ def update(user_data):
     """
     Mettre à jour un évènement dont vous êtes responsable.
     """
-
     event_id = click.prompt('ID de l\'évènement à mettre à jour', type=int)
 
     event_controller = EventController()
     event = event_controller.get_event_by_id(event_id)
-    
+    if not event:
+        click.echo("Evènement introuvable.")
+        event_controller.close()
+        return
+
     # Vérifier que l'évènement appartient à l'utilisateur
     if event.support_contact_id != user_data['user_id']:
-        click.echo("Vous n'êtes pas responsable de cet évènement. Vous ne pouvez pas le modifier.")
+        click.echo("Vous n'êtes pas responsable de cet évènement. Impossible de le modifier.")
         event_controller.close()
         return
     
-    # Collecte les nouvelles informations de l'évènement pour la mise à jour
-    name = click.prompt('Nouveau nom de l\'évènement', default=event.name)
-    event_date_start = click.prompt('Nouvelle date de début de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
-    event_date_end = click.prompt('Nouvelle date de fin de l\'évènement (JJ/MM/AAAA HH:MM)', type=str)
-    location = click.prompt('Nouveau lieu de l\'évènement', default=event.location)
-    attendees = click.prompt('Nouveau nombre de participants', type=int, default=event.attendees)   
-    notes = click.prompt('Nouvelles notes supplémentaires', default=event.notes)
+    # Collecte les nouvelles informations
+    name = click.prompt('Nouveau nom', default=event.name)
+    event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA HH:MM)', default=event.event_date_start.strftime("%d/%m/%Y %H:%M"))
+    event_date_end_str = click.prompt('Nouvelle date de fin (JJ/MM/AAAA HH:MM)', default=event.event_date_end.strftime("%d/%m/%Y %H:%M"))
+    location = click.prompt('Nouveau lieu', default=event.location)
+    attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)   
+    notes = click.prompt('Nouvelles notes', default=event.notes)
 
     event_data = {
         'name': name,
-        'event_date_start': event_date_start,
-        'event_date_end': event_date_end,
+        'event_date_start_str': event_date_start_str,
+        'event_date_end_str': event_date_end_str,
         'location': location,
         'attendees': attendees,
         'notes': notes
     }
 
-    updated_event = event_controller.update_event(event_id, event_data)
-    event_controller.close()
+    try:
+        updated_event = event_controller.update_event(event_id, event_data)
+        if updated_event:
+            log_info(get_logger('events'), f"Evènement mis à jour: ID {updated_event.id}")
+            click.echo(f"Evènement mis à jour avec succès : ID {updated_event.id}")
+        else:
+            click.echo("Erreur lors de la mise à jour de l'évènement.")
+    except ValueError as ve:
+        # Erreur métier
+        click.echo(f"Erreur: {ve}")
+    except Exception as e:
+        # Erreur inattendue
+        log_error(get_logger('events'), f"Erreur inattendue lors de la mise à jour de l'évènement : {str(e)}")
+        click.echo("Erreur inattendue lors de la mise à jour de l'évènement.")
 
-    if updated_event:
-        click.echo(f"Evènement mis à jour avec succès : ID {updated_event.id}")
-    else:
-        click.echo("Erreur lors de la mise à jour de l'évènement.")
+    event_controller.close()
 
     
 
