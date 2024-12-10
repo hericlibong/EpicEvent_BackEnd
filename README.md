@@ -51,8 +51,12 @@ L’application utilise des composants et bibliothèques de référence :
     ```bash
     pip install -r requirements.txt
     ```
+4. Aller dans l'application
+    ```bash
+    cd epicevents
+    ```
 
-4. Configurer les variables d’environnement :
+5. Configurer les variables d’environnement :
 
     Renommez le fichier `.env_sample` en `.env` à la racine du projet pour y stocker les informations sensibles (clés secrètes, identifiants de base de données, DSN Sentry, etc.) :
 
@@ -70,7 +74,7 @@ L’application utilise des composants et bibliothèques de référence :
 
     Adaptez ces informations à vos besoins.
 
-5. Initialiser la base de données :
+6. Initialiser la base de données :
 
     L’application utilise Alembic (si intégré) pour les migrations. Exécutez les migrations initiales (ou directement le `create_all` si encore à l’étape de développement) :
 
