@@ -11,6 +11,7 @@ DEPARTMENT_PERMISSIONS = {
         'can_filter_contracts': True,
         'can_modify_all_clients': True,
         'can_list_users': True,
+        'can_delete_contracts': True,
     },
     'Commercial': {
         'can_create_clients': True,

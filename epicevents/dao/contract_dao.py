@@ -44,7 +44,13 @@ class ContractDAO(BaseDAO):
         for key, value in contract_data.items():
             setattr(contract, key, value)
         self.session.commit()
-        self.session.refresh(contract)
+
+        # Recharger le contrat avec les relations nécessaires
+        contract = self.session.query(Contract).options(
+            joinedload(Contract.client), 
+            joinedload(Contract.sales_contact)).filter_by(id=contract.id).one()
+        self.session.expunge(contract)
+        #self.session.refresh(contract)
         return contract
     
     def get_contracts_by_client_id(self, client_id: int):

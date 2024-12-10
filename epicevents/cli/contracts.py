@@ -3,10 +3,11 @@ import click
 from rich.console import Console
 from rich.table import Table
 from controllers.contract_controller import ContractController
-from controllers.user_controller import UserController
-from controllers.client_controller import ClientController
 from utils.decorators import require_permission
 from click_aliases import ClickAliasedGroup
+from utils.logger import get_logger, log_info, log_error
+
+logger = get_logger('contracts')
 
 
 @click.group(cls=ClickAliasedGroup)
@@ -26,41 +27,48 @@ def create(user_data):
     amount = click.prompt('Montant total', type=float)
     remaining_amount = click.prompt('Montant restant', type=float)
     status = click.prompt('Statut (1 pour signé, 0 pour en attente)', type=int)
-    sales_contact_id = click.prompt('ID du commercial', type=int)
+    #sales_contact_id = click.prompt('ID du commercial', type=int)
 
     contract_data = {
         'client_id': client_id,
         'amount': amount,
         'remaining_amount': remaining_amount,
         'status': bool(status),
-        'sales_contact_id': sales_contact_id
+        #'sales_contact_id': sales_contact_id
     }
 
     # Créer le contrat via le contrôleur
     contract_controller = ContractController()
-    contract = contract_controller.create_contract(contract_data)
-    contract_controller.close()
 
-    if contract:
+    try : 
+        contract = contract_controller.create_contract(contract_data)
+        contract_controller.close()
 
-        console = Console()
-        table = Table(title="Contrat créé avec succès", show_header=False)
+        if contract:
+            # Journalisation du contrat créé
+            log_info(
+                logger, 
+                f"Contrat créé avec succès : ID {contract.id} commercial: {contract.sales_contact.fullname}"
+                )
 
-        table.add_column("champ", style="bold cyan")
-        table.add_column("valeur", style="bold magenta")
+            console = Console()
+            table = Table(title="Contrat créé avec succès", show_header=False)
 
-        table.add_row("ID", str(contract.id))
-        table.add_row("Client", contract.client.fullname)
-        table.add_row("Montant total", str(contract.amount))
-        table.add_row("Montant restant", str(contract.remaining_amount))
-        table.add_row("Commercial", contract.sales_contact.fullname)
-        console.print(table)
-        
-    else:
+            table.add_column("champ", style="bold cyan")
+            table.add_column("valeur", style="bold magenta")
+
+            table.add_row("ID", str(contract.id))
+            table.add_row("Client", contract.client.fullname)
+            table.add_row("Montant total", str(contract.amount))
+            table.add_row("Montant restant", str(contract.remaining_amount))
+            table.add_row("Commercial", contract.sales_contact.fullname)
+            console.print(table)  
+        else:
+            click.echo("Erreur lors de la création du contrat.")
+    except ValueError :
         click.echo("Erreur lors de la création du contrat.")
-
-
-
+        contract_controller.close()
+        
 @contracts.command(name='update')
 @require_permission('can_modify_all_contracts', 'can_modify_own_contracts')
 def update_contract(user_data, user_permissions):
@@ -68,16 +76,19 @@ def update_contract(user_data, user_permissions):
     Mettre à jour un contrat existant.
     """
     contract_id = click.prompt('ID du contrat à mettre à jour', type=int)
-
     contract_controller = ContractController()
+    
+    # Récupérer le contrat par ID pour connaître l'ancien statut
     contract = contract_controller.get_contract_by_id(contract_id)
     if not contract:
         click.echo("Contrat introuvable.")
         contract_controller.close()
         return
+    
+    old_status = contract.status
 
+    # Vérifier les permissions de l'utilisateur
     user_id = user_data.get('user_id')
-
     if 'can_modify_all_contracts' in user_permissions:
         # L'utilisateur peut modifier n'importe quel contrat
         pass  # Pas de vérification supplémentaire nécessaire
@@ -88,12 +99,11 @@ def update_contract(user_data, user_permissions):
             contract_controller.close()
             return
     else:
-        # Ceci ne devrait pas se produire car le décorateur a déjà vérifié les permissions
         click.echo("Vous n'avez pas la permission de modifier des contrats.")
         contract_controller.close()
         return
 
-    # Collecte des informations du contrat avec valeurs par défaut
+    # Collecte des informations du contrat à mettre à jour avec valeurs par défaut
     amount = click.prompt('Nouveau montant total', default=contract.amount, type=float)
     remaining_amount = click.prompt('Nouveau montant restant', default=contract.remaining_amount, type=float)
     status = click.prompt('Nouveau statut (1 pour signé, 0 pour en attente)', default=int(contract.status), type=int)
@@ -103,18 +113,48 @@ def update_contract(user_data, user_permissions):
         'remaining_amount': remaining_amount,
         'status': bool(status),
     }
+    try:
+        # Mettre à jour le contrat via le contrôleur
+        updated_contract = contract_controller.update_contract(contract_id, contract_data)
+        # contract_controller.close()
 
-    # Mettre à jour le contrat via le contrôleur
-    updated_contract = contract_controller.update_contract(contract_id, contract_data)
-    contract_controller.close()
-
-    if updated_contract:
-        click.echo(f"Contrat mis à jour avec succès : ID {updated_contract.id}")
-    else:
+        if updated_contract:
+            # Journalisation de la mise à jour du contrat
+            if old_status is False and updated_contract.status is True:
+                # Journalisation spécifique pour un contrat signé
+                log_info(
+                    logger,
+                    f"Contrat signé avec succès : ID {updated_contract.id} commercial: {updated_contract.sales_contact.fullname}"
+                )
+                click.echo(f"Contrat signé avec succès : ID {updated_contract.id}")
+            else:
+                log_info(
+                    logger,
+                    f"Contrat mis à jour avec succès : ID {updated_contract.id} commercial: {updated_contract.sales_contact.fullname}"
+                )
+                click.echo(f"Contrat mis à jour avec succès : ID {updated_contract.id}")
+            console = Console()
+            table = Table(title="Contrat mis à jour avec succès", show_header=False)
+            table.add_column("champ", style="bold cyan")
+            table.add_column("valeur", style="bold magenta")
+            table.add_row("ID", str(updated_contract.id))
+            table.add_row("Client", updated_contract.client.fullname)
+            table.add_row("Montant total", str(updated_contract.amount))
+            table.add_row("Montant restant", str(updated_contract.remaining_amount))
+            table.add_row("Commercial", updated_contract.sales_contact.fullname)
+            console.print(table)
+            #click.echo(f"Contrat mis à jour avec succès : ID {updated_contract.id}")
+        else:
+            click.echo("Erreur lors de la mise à jour du contrat.")
+    except ValueError as ve:
+        # Erreur métier pas d'envvoi vers Sentry
+        click.echo(f"Erreur lors de la mise à jour du contrat:{ve}")
+        contract_controller.close()
+    except Exception as e:
+        # Erreur inattendue, on log_error et affiche un message générique
+        log_error(logger, f"Erreur inattendue lors de la mise à jour du contrat : {str(e)}")
         click.echo("Erreur lors de la mise à jour du contrat.")
-
-
-
+        contract_controller.close()
 
 # Commande pour lister tous les contrats
 @contracts.command(name='list-contracts', aliases=[''])
@@ -186,4 +226,36 @@ def list_contracts(user_data, status, payment, own):
         )
     console.print(table)
 
+@contracts.command(name='delete')
+@require_permission('can_delete_contracts')
+def delete_contract(user_data):
+    """
+    Supprimer un contrat existant.
+    """
+    contract_id = click.prompt('ID du contrat à supprimer', type=int)
+    contract_controller = ContractController()
 
+    contract = contract_controller.get_contract_by_id(contract_id)
+    if not contract:
+        click.echo("Contrat introuvable.")
+        contract_controller.close()
+        return
+
+    try:
+        success = contract_controller.delete_contract(contract_id)
+        contract_controller.close()
+        if success:
+            # Journaliser le succès
+            log_info(logger, f"Contrat ID {contract_id} supprimé avec succès.")
+            click.echo(f"Contrat ID {contract_id} supprimé avec succès.")
+        else:
+            click.echo("Impossible de supprimer le contrat (inexistant ?).")
+
+    except ValueError as ve:
+        # Erreur métier, pas besoin de log_error
+        click.echo(f"Erreur lors de la suppression du contrat : {ve}")
+        contract_controller.close()
+    except Exception as e:
+        log_error(logger, f"Erreur inattendue lors de la suppression du contrat : {str(e)}")
+        click.echo("Erreur lors de la suppression du contrat.")
+        contract_controller.close()
