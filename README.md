@@ -72,23 +72,66 @@ L’application utilise des composants et bibliothèques de référence :
 
     ```
 
-    Adaptez ces informations à vos besoins.
+    ### Configuration de la Base de Données
 
-6. Initialiser la base de données :
+    #### Connexion au Super-Utilisateur PostgreSQL
 
-    L’application utilise Alembic (si intégré) pour les migrations. Exécutez les migrations initiales (ou directement le `create_all` si encore à l’étape de développement) :
+    Ouvrez une console (PowerShell, CMD sous Windows ou un terminal sous Linux/macOS) et connectez-vous à PostgreSQL en tant que super-utilisateur postgres :
+
+    ```bash
+    psql -U postgres
+    ```
+
+    Saisissez le mot de passe postgres si nécessaire.
+
+    #### Création de la Base de Données et de l’Utilisateur
+
+    Dans le prompt psql, exécutez :
+
+    ```sql
+    CREATE DATABASE epicevents_db;
+    CREATE USER epicenvents_user WITH PASSWORD 'M0tD3P4ss3';
+    GRANT ALL PRIVILEGES ON DATABASE epicevents_db TO epicenvents_user;
+    \q
+    ```
+
+    **Conseil** : Utilisez des identifiants simples, sans accents ni caractères spéciaux complexes. Par exemple :
+
+    - Utilisateur : `epicenvents_user`
+    - Mot de passe : `MySecurePassword123` (pas d’accents, pas d’espaces)
+
+    #### Configurer le Fichier .env
+
+    Copiez le fichier d’exemple fourni :
+
+    ```bash
+    cp .env_sample .env
+    ```
+
+    Ouvrez le fichier `.env` (situé dans le répertoire epicevents) et mettez à jour les variables :
+
+    ```env
+    DB_USER=epicenvents_user
+    DB_PASSWORD=MySecurePassword123
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_NAME=epicevents_db
+
+    SECRET_KEY=my_secret_key
+    SENTRY_DSN=
+    ```
+
+    Assurez-vous que le fichier `.env` est bien dans le répertoire epicevents et qu’il ne contient aucun caractère accentué ou problème d’encodage. Assurez-vous également que ce fichier n’est pas versionné (il doit être listé dans `.gitignore`).
+
+    #### Initialiser la Base de Données avec Alembic
+
+    Depuis le répertoire epicevents (là où se trouvent `alembic.ini` et le dossier `alembic`), lancez :
 
     ```bash
     alembic upgrade head
     ```
 
-    Sinon, si vous êtes au stade de développement initial :
-
-    ```bash
-    python main.py init-db
-    ```
-
-    (Cette commande dépend de votre implémentation ; assurez-vous d'avoir un point d’entrée pour créer les tables.)
+    Cette commande applique les migrations définies dans `alembic/versions` et crée les tables nécessaires dans la base de données `epicevents_db`.
 
 ## Utilisation
 
@@ -155,27 +198,5 @@ Cela affichera la liste des commandes disponibles et leurs options.
     python main.py list-events --help
     ```
 
-## Tests
 
-Les tests unitaires et d’intégration sont placés dans le répertoire `tests/`. Pour les exécuter :
-
-```bash
-pytest
-```
-
-Vous pouvez également générer un rapport de couverture de code :
-
-```bash
-pytest --cov=epicevents
-```
-
-## Qualité du Code
-
-Pour analyser la qualité du code :
-
-```bash
-flake8 --format=html --htmldir=flake8_report
-```
-
-Ouvrez `flake8_report/index.html` dans votre navigateur pour consulter le rapport.
 
