@@ -94,9 +94,27 @@ L’application utilise des composants et bibliothèques de référence :
 
 L’application se pilote via la ligne de commande. Une fois installée et configurée, vous pouvez lancer :
 
-```bash
-python main.py --help
-```
+    ```bash
+    python main.py --help
+    ```
+
+    Exemple d'affichage d'aide : 
+
+    ```bash
+        Usage: main.py [OPTIONS] COMMAND [ARGS]...
+
+    Interface en ligne de commande pour Epic Events.
+
+    Options:
+    --help  Show this message and exit.
+
+    Commands:
+    clients         Commandes pour gérer les clients.
+    contracts       Commandes pour gérer les contrats.
+    events          Commandes pour gérer les événements.
+    sample-command  Commande d'exemple avec journalisation.
+    users           Commandes pour gérer les utilisateurs.
+    ```
 
 Cela affichera la liste des commandes disponibles et leurs options.
 
