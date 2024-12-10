@@ -61,13 +61,13 @@ L’application utilise des composants et bibliothèques de référence :
     Renommez le fichier `.env_sample` en `.env` à la racine du projet pour y stocker les informations sensibles (clés secrètes, identifiants de base de données, DSN Sentry, etc.) :
 
     ```env
-    DB_USER=epicenvents_user
-    DB_PASSWORD=V0tr3M0tD3P4ss3S3cur1s3!
+    DB_USER=<votre db username>
+    DB_PASSWORD=<votre db password>
     DB_HOST=localhost
     DB_PORT=5432
-    DB_NAME=epicevents_db
+    DB_NAME=<nom de votre base de données>
 
-    SECRET_KEY=une_clé_secrète_complexe
+    SECRET_KEY=<cle de votre jwtoken>
     SENTRY_DSN=
 
     ```
