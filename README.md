@@ -56,21 +56,7 @@ L’application utilise des composants et bibliothèques de référence :
     cd epicevents
     ```
 
-5. Configurer les variables d’environnement :
 
-    Renommez le fichier `.env_sample` en `.env` à la racine du projet pour y stocker les informations sensibles (clés secrètes, identifiants de base de données, DSN Sentry, etc.) :
-
-    ```env
-    DB_USER=<votre db username>
-    DB_PASSWORD=<votre db password>
-    DB_HOST=localhost
-    DB_PORT=5432
-    DB_NAME=<nom de votre base de données>
-
-    SECRET_KEY=<cle de votre jwtoken>
-    SENTRY_DSN=
-
-    ```
 
     ### Configuration de la Base de Données
 
@@ -102,7 +88,7 @@ L’application utilise des composants et bibliothèques de référence :
 
     #### Configurer le Fichier .env
 
-    Copiez le fichier d’exemple fourni :
+    Renommez le fichier d’exemple  fourni :
 
     ```bash
     cp .env_sample .env
