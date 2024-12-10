@@ -31,11 +31,11 @@ L’application utilise des composants et bibliothèques de référence :
 
 ## Installation
 
-1. Cloner le dépôt :
+1. Cloner le repo :
 
     ```bash
-    git clone https://github.com/<votre-compte-github>/epicevents-crm.git
-    cd epicevents-crm
+    git clone https://github.com/hericlibong/EpicEvent_BackEnd.git
+    cd EpicEvent_Backend
     ```
 
 2. Créer et activer un environnement virtuel (optionnel mais recommandé) :
@@ -54,12 +54,18 @@ L’application utilise des composants et bibliothèques de référence :
 
 4. Configurer les variables d’environnement :
 
-    Créez un fichier `.env` à la racine du projet pour y stocker les informations sensibles (clés secrètes, identifiants de base de données, DSN Sentry, etc.) :
+    Renommez le fichier `.env_sample` en `.env` à la racine du projet pour y stocker les informations sensibles (clés secrètes, identifiants de base de données, DSN Sentry, etc.) :
 
     ```env
-    DATABASE_URL=postgresql://user:password@localhost/epicevents
-    SECRET_KEY=une_cle_secrete_pour_les_jwt
-    SENTRY_DSN=votre_dsn_sentry
+    DB_USER=epicenvents_user
+    DB_PASSWORD=V0tr3M0tD3P4ss3S3cur1s3!
+    DB_HOST=localhost
+    DB_PORT=5432
+    DB_NAME=epicevents_db
+
+    SECRET_KEY=une_clé_secrète_complexe
+    SENTRY_DSN=
+
     ```
 
     Adaptez ces informations à vos besoins.
@@ -95,7 +101,7 @@ Cela affichera la liste des commandes disponibles et leurs options.
 - **Authentification** :
 
     ```bash
-    python main.py login
+    python main.py users login
     ```
 
     Saisissez votre nom d’utilisateur et mot de passe. Un jeton d’authentification sera généré et stocké (selon votre implémentation) pour les prochaines commandes.
@@ -103,7 +109,7 @@ Cela affichera la liste des commandes disponibles et leurs options.
 - **Gestion des clients** :
 
     ```bash
-    python main.py create-client --name "Kevin Casey" --email "kevin@startup.io" --phone "+67812345678" --company "Cool Startup LLC"
+    python main.py clients create-clients
     ```
 
     Cette commande crée un nouveau client dans la base.
@@ -111,7 +117,7 @@ Cela affichera la liste des commandes disponibles et leurs options.
 - **Liste des clients** :
 
     ```bash
-    python main.py list-clients
+    python main.py clients list-clients
     ```
 
     Affiche tous les clients. Vous pouvez ajouter des options pour filtrer ou trier.
@@ -149,21 +155,3 @@ flake8 --format=html --htmldir=flake8_report
 
 Ouvrez `flake8_report/index.html` dans votre navigateur pour consulter le rapport.
 
-## Contribuer
-
-- **Branching model** : Utilisez des branches nommées de manière explicite pour chaque nouvelle fonctionnalité ou correction de bug.
-- **Pull requests** : Envoyez des pull requests claires, avec une description des modifications apportées.
-- **Tests et Documentation** : Ajoutez ou mettez à jour les tests et la documentation lorsque vous apportez une modification.
-
-## Sécurité et Clés Sensibles
-
-- Ne commitez jamais vos clés sensibles ou mots de passe dans le dépôt.
-- Stockez les clés dans le fichier `.env` qui n’est pas versionné (à lister dans `.gitignore`).
-
-## Auteurs
-
-[Votre Nom ou le Nom de l’Équipe]
-
-## Licence
-
-Ce projet est interne à Epic Events. Contactez l’administrateur du projet pour plus d’informations sur les droits d’utilisation.
