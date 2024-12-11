@@ -1,5 +1,6 @@
 from dao.event_dao import EventDAO
 from dao.contract_dao import ContractDAO
+from dao.user_dao import UserDAO
 from datetime import datetime, timedelta
 from utils.logger import get_logger, log_error
 
@@ -9,6 +10,7 @@ class EventController:
     def __init__(self):
         self.event_dao = EventDAO()
         self.contract_dao = ContractDAO()
+        self.user_dao = UserDAO()
     
     def parse_datetime(self, date_str):
         # Supposons le format JJ/MM/AAAA HH:MM
@@ -97,6 +99,7 @@ class EventController:
             
             updated_event = self.event_dao.update_event(event_id, {
                 'name': event_data.get('name', event.name),
+                'support_contact_id': event_data.get('support_contact_id', event.support_contact_id),
                 'event_date_start': start_dt,
                 'event_date_end': end_dt,
                 'location': event_data.get('location', event.location),
@@ -128,10 +131,20 @@ class EventController:
         """
         Assigner un contact de support à un événement.
         """
+        # Récupérer l'utilisateur à assigner
+        support_user = self.user_dao.get_user_by_id(support_user_id)
+        if support_user is None:
+            raise ValueError("Utilisateur de support introuvable.")
+        
+        # Vérifier que l'utlisateur appartient au département de support
+        if support_user.department.lower() != 'support':
+            raise ValueError("Utilisateur n'appartient pas au département de support.")
+            
+        # Si l'utilisateur est bien du support, assigner le support à l'événement
         event = self.event_dao.assign_support(event_id, support_user_id)
         if not event:
-            print("Aucun événement trouvé.")
-            return None
+            raise ValueError("Aucun événement trouvé.")
+   
         return event
     
     def get_events_by_support(self, support_user_id):

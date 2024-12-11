@@ -80,6 +80,73 @@ def create(user_data):
     event_controller.close()
 
 
+# @events.command(name='update')
+# @require_permission('can_modify_own_events', 'can_modify_all_events')
+# def update(user_data, user_permisions):
+#     """
+#     Mettre à jour un évènement dont vous êtes responsable.
+#     """
+#     event_id = click.prompt('ID de l\'évènement à mettre à jour', type=int)
+
+#     event_controller = EventController()
+#     event = event_controller.get_event_by_id(event_id)
+#     if not event:
+#         click.echo("Evènement introuvable.")
+#         event_controller.close()
+#         return
+    
+#     # Vérifier si l'utilisateur a la permission de modifier tous les évènements
+#     user_id = user_data.get('user_id')
+#     if 'can_modify_all_events' in user_permisions:
+#         # L'utilisateur a la permission de modifier tous les évènements
+#         pass
+#     elif 'can_modify_own_events' in user_permisions:
+#         # Vérifier que l'évènement appartient à l'utilisateur
+#         if event.support_contact_id != user_id:
+#             click.echo("Vous n'êtes pas responsable de cet évènement. Impossible de le modifier.")
+#             event_controller.close()
+#             return
+#     else:
+#         click.echo("Vous n'êtes pas autorisé à modifier les évènements.")
+#         event_controller.close()
+#         return
+    
+#     # Collecte les nouvelles informations
+#     name = click.prompt('Nouveau nom', default=event.name)
+#     support_contact_id = click.prompt('ID du nouveau contact support', type=int)
+#     event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA)', default=event.event_date_start.strftime("%d/%m/%Y"))
+#     event_date_end_str = click.prompt('Nouvelle date de fin (JJ/MM/AAAA)', default=event.event_date_end.strftime("%d/%m/%Y"))
+#     location = click.prompt('Nouveau lieu', default=event.location)
+#     attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)   
+#     notes = click.prompt('Nouvelles notes', default=event.notes)
+
+#     event_data = {
+#         'name': name,
+#         'support_contact_id': support_contact_id,
+#         'event_date_start_str': event_date_start_str,
+#         'event_date_end_str': event_date_end_str,
+#         'location': location,
+#         'attendees': attendees,
+#         'notes': notes
+#     }
+
+#     try:
+#         updated_event = event_controller.update_event(event_id, event_data)
+#         if updated_event:
+#             log_info(get_logger('events'), f"Evènement mis à jour: ID {updated_event.id}")
+#             click.echo(f"Evènement mis à jour avec succès : ID {updated_event.id}")
+#         else:
+#             click.echo("Erreur lors de la mise à jour de l'évènement.")
+#     except ValueError as ve:
+#         # Erreur métier
+#         click.echo(f"Erreur: {ve}")
+#     except Exception as e:
+#         # Erreur inattendue
+#         log_error(get_logger('events'), f"Erreur inattendue lors de la mise à jour de l'évènement : {str(e)}")
+#         click.echo("Erreur inattendue lors de la mise à jour de l'évènement.")
+
+#     event_controller.close()
+
 @events.command(name='update-own')
 @require_permission('can_modify_own_events')
 def update(user_data):
@@ -151,7 +218,17 @@ def assign_support(user_data): # Pourquoi user_data en argument alors qu'il n'es
     event_controller.close()
     
     if success:
+        # Journaliser le succès
+        log_info(get_logger('events'), f"Contact support assigné à l'événement ID {event_id}")
         click.echo(f"Contact support assigné avec succès à l'événement ID {event_id}")
+        console = Console()
+        table = Table(title="Contact support assigné avec succès", show_header=False)
+        table.add_column("champ", style="bold cyan")
+        table.add_column("valeur", style="bold magenta")
+        table.add_row("ID de l'événement", str(event_id))
+        table.add_row("ID du contact support", str(support_user_id))
+        table.add_row("Nom du contact support", event_controller.get_events_by_support(support_user_id)[0].support_contact.fullname) 
+        console.print(table)
     else:
         click.echo("Erreur lors de l'assignation du contact support.")
 
