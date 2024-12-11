@@ -7,3 +7,5 @@ epicevents.egg-info/
 epicevents/__pycache__/
 epicevents/.coverage
 epicevents/.pytest_cache/
+epicevents/test_connection.py
+epicevents/create_table.py
