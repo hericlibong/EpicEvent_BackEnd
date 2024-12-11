@@ -184,5 +184,20 @@ Cela affichera la liste des commandes disponibles et leurs options.
     python main.py list-events --help
     ```
 
+## Schéma de la Base de Données
+
+Le schéma ci-dessous représente les différentes tables de la base de données et leurs relations :
+
+![Schéma de la Base de Données](docs/database_schema.png)
+
+Ce diagramme montre les entités suivantes :
+- `users` : Gère les utilisateurs internes (commerciaux, support, gestion).
+- `clients` : Liste des clients de l’entreprise.
+- `contracts` : Contrats signés avec les clients, incluant le montant, la date, etc.
+- `events` : Événements organisés pour les clients, liés aux contrats signés.
+- `departments` : Représente les départements au sein de l'organisation.
+
+
+
 
 
