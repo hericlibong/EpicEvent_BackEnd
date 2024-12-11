@@ -4,3 +4,6 @@ __pycache__/
 venv/
 setup.py
 epicevents.egg-info/
+epicevents/__pycache__/
+epicevents/.coverage
+epicevents/.pytest_cache/
