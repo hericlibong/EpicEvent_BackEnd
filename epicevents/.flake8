@@ -1,0 +1,7 @@
+[flake8]
+exclude = 
+    alembic/,
+    test_connexion.py,
+    create_tables.py
+max-line-length = 120
+    

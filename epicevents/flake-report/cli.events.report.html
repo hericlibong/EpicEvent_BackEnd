@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>flake8 violations: cli\events.py</title>
+      <meta http-equiv="Content-Type" value="text/html; charset=UTF-8">
+      <link rel="stylesheet" href="styles.css">
+<script>
+function bindHandler(link) {
+   var code = link.getAttribute('data-code');
+   var key = location.pathname + '#' + code;
+
+   var ul = link.parentNode.querySelector('.details');
+   if (sessionStorage[key] != 'open') {
+      ul.style.display = 'none';
+   }
+   link.addEventListener('click', function (event) {
+      if (!ul.style.display || ul.style.display == 'none') {
+         ul.style.display = 'block';
+         sessionStorage[key] = 'open';
+      } else {
+         ul.style.display = 'none';
+         sessionStorage[key] = 'closed';
+      }
+   });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+   var links = document.querySelectorAll('#index > li > a');
+   for (var i = 0; i < links.length; i++) {
+      bindHandler(links[i]);
+   }
+});
+</script>
+   </head>
+   <body>
+      <div id="masthead" class="sev-1"></div>
+      <div id="page">
+         <p id="srclink">
+            <a title="View full annotated source"
+               href="cli.events.source.html">
+               <img src="file.svg" alt="&#x2261;">
+            </a></p>
+         <h1>
+            <a href="index.html">
+               <img src="back.svg" alt="&#x2B05;">
+               cli\events.py
+            </a>
+         </h1>
+
+         <ul id="index">
+         
+         <li>
+            <a data-code="F401">
+               <span class="count sev-1">
+                  2
+               </span>
+               <strong>F401:</strong> 'controllers.client_controller.ClientController' imported but unused
+               
+                  (and 1 similar)
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <p>'controllers.client_controller.ClientController' imported but unused:</p>
+               
+               <a href="cli.events.source.html#l7">
+                  <tt><i>7</i> <span class="kn">from</span> <span class="nn">controllers.client_controller</span> <span class="kn">import</span> <span class="n">ClientController</span></tt>
+               </a>
+            </li><li>
+               
+               <p>'controllers.contract_controller.ContractController' imported but unused:</p>
+               
+               <a href="cli.events.source.html#l8">
+                  <tt><i>8</i> <span class="kn">from</span> <span class="nn">controllers.contract_controller</span> <span class="kn">import</span> <span class="n">ContractController</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="W293">
+               <span class="count sev-2">
+                  9
+               </span>
+               <strong>W293:</strong> blank line contains whitespace
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.events.source.html#l32">
+                  <tt><i>32</i>         </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l55">
+                  <tt><i>55</i>             </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l103">
+                  <tt><i>103</i>     </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l138">
+                  <tt><i>138</i>     </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l152">
+                  <tt><i>152</i>     </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l186">
+                  <tt><i>186</i>     </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l192">
+                  <tt><i>192</i>     </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l253">
+                  <tt><i>253</i>     </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l292">
+                  <tt><i>292</i>         </tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E302">
+               <span class="count sev-2">
+                  3
+               </span>
+               <strong>E302:</strong> expected 2 blank lines, found 1
+               
+                  (and 1 similar)
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <p>Expected 2 blank lines, found 1:</p>
+               
+               <a href="cli.events.source.html#l12">
+                  <tt><i>12</i> <span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">()</span></tt>
+               </a>
+            </li><li>
+               
+               <p>Expected 2 blank lines, found 4:</p>
+               
+               <a href="cli.events.source.html#l162">
+                  <tt><i>162</i> <span class="nd">@events</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;list-filtered&#39;</span><span class="p">)</span></tt>
+               </a>
+            </li><li>
+               
+               <p>Expected 2 blank lines, found 1:</p>
+               
+               <a href="cli.events.source.html#l233">
+                  <tt><i>233</i> <span class="nd">@events</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;list-all&#39;</span><span class="p">)</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="W291">
+               <span class="count sev-2">
+                  3
+               </span>
+               <strong>W291:</strong> trailing whitespace
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.events.source.html#l109">
+                  <tt><i>109</i>     <span class="n">attendees</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s1">&#39;Nouveau nombre participants&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">attendees</span><span class="p">)</span>   </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l164">
+                  <tt><i>164</i> <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--no-support&#39;</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Afficher uniquement les événements sans contact support&#39;</span><span class="p">)</span> </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l257">
+                  <tt><i>257</i>         <span class="n">show_header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> </tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E128">
+               <span class="count sev-2">
+                  2
+               </span>
+               <strong>E128:</strong> continuation line under-indented for visual indent
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.events.source.html#l221">
+                  <tt><i>221</i>             <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">contract</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">contract</span><span class="o">.</span><span class="n">client</span> <span class="k">else</span> <span class="s2">&quot;Non défini&quot;</span><span class="p">),</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.events.source.html#l281">
+                  <tt><i>281</i>             <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">contract</span> <span class="ow">and</span> <span class="n">event</span><span class="o">.</span><span class="n">contract</span><span class="o">.</span><span class="n">client</span> <span class="k">else</span> <span class="s2">&quot;Non défini&quot;</span><span class="p">),</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E303">
+               <span class="count sev-2">
+                  2
+               </span>
+               <strong>E303:</strong> too many blank lines (3)
+               
+                  (and 1 similar)
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <p>Too many blank lines (3):</p>
+               
+               <a href="cli.events.source.html#l140">
+                  <tt><i>140</i> <span class="nd">@events</span><span class="o">.</span><span class="n">command</span><span class="p">()</span></tt>
+               </a>
+            </li><li>
+               
+               <p>Too many blank lines (4):</p>
+               
+               <a href="cli.events.source.html#l161">
+                  <tt><i>161</i> <span class="c1"># Commandes pour filtrer les évènements pour le support et la gestion</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E501">
+               <span class="count sev-2">
+                  2
+               </span>
+               <strong>E501:</strong> line too long (143 > 120 characters)
+               
+                  (and 1 similar)
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <p>Line too long (143 > 120 characters):</p>
+               
+               <a href="cli.events.source.html#l106">
+                  <tt><i>106</i>     <span class="n">event_date_start_str</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s1">&#39;Nouvelle date de début (JJ/MM/AAAA HH:MM)&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">event_date_start</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y %H:%M&quot;</span><span class="p">))</span></tt>
+               </a>
+            </li><li>
+               
+               <p>Line too long (137 > 120 characters):</p>
+               
+               <a href="cli.events.source.html#l107">
+                  <tt><i>107</i>     <span class="n">event_date_end_str</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">prompt</span><span class="p">(</span><span class="s1">&#39;Nouvelle date de fin (JJ/MM/AAAA HH:MM)&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">event_date_end</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y %H:%M&quot;</span><span class="p">))</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E261">
+               <span class="count sev-2">
+                  1
+               </span>
+               <strong>E261:</strong> at least two spaces before inline comment
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.events.source.html#l142">
+                  <tt><i>142</i> <span class="k">def</span> <span class="nf">assign_support</span><span class="p">(</span><span class="n">user_data</span><span class="p">):</span> <span class="c1"># Pourquoi user_data en argument alors qu&#39;il n&#39;est pas appelé?</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         </ul>
+      </div>
+   </body>
+</html>

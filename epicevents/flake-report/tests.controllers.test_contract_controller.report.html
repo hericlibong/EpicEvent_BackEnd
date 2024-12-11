@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>flake8 violations: tests\controllers\test_contract_controller.py</title>
+      <meta http-equiv="Content-Type" value="text/html; charset=UTF-8">
+      <link rel="stylesheet" href="styles.css">
+<script>
+function bindHandler(link) {
+   var code = link.getAttribute('data-code');
+   var key = location.pathname + '#' + code;
+
+   var ul = link.parentNode.querySelector('.details');
+   if (sessionStorage[key] != 'open') {
+      ul.style.display = 'none';
+   }
+   link.addEventListener('click', function (event) {
+      if (!ul.style.display || ul.style.display == 'none') {
+         ul.style.display = 'block';
+         sessionStorage[key] = 'open';
+      } else {
+         ul.style.display = 'none';
+         sessionStorage[key] = 'closed';
+      }
+   });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+   var links = document.querySelectorAll('#index > li > a');
+   for (var i = 0; i < links.length; i++) {
+      bindHandler(links[i]);
+   }
+});
+</script>
+   </head>
+   <body>
+      <div id="masthead" class="sev-2"></div>
+      <div id="page">
+         <p id="srclink">
+            <a title="View full annotated source"
+               href="tests.controllers.test_contract_controller.source.html">
+               <img src="file.svg" alt="&#x2261;">
+            </a></p>
+         <h1>
+            <a href="index.html">
+               <img src="back.svg" alt="&#x2B05;">
+               tests\controllers\test_contract_controller.py
+            </a>
+         </h1>
+
+         <ul id="index">
+         
+         <li>
+            <a data-code="E302">
+               <span class="count sev-2">
+                  14
+               </span>
+               <strong>E302:</strong> expected 2 blank lines, found 1
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l6">
+                  <tt><i>6</i> <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l11">
+                  <tt><i>11</i> <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l17">
+                  <tt><i>17</i> <span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l53">
+                  <tt><i>53</i> <span class="k">def</span> <span class="nf">test_get_all_contracts</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">sample_contract</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l67">
+                  <tt><i>67</i> <span class="k">def</span> <span class="nf">test_create_contract_with_valid_data</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">sample_contract</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l93">
+                  <tt><i>93</i> <span class="k">def</span> <span class="nf">test_create_contract_failure</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">capsys</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l116">
+                  <tt><i>116</i> <span class="k">def</span> <span class="nf">test_get_contract_by_id_not_found</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">capsys</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l136">
+                  <tt><i>136</i> <span class="k">def</span> <span class="nf">test_get_contract_by_id_found</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">sample_contract</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l173">
+                  <tt><i>173</i> <span class="k">def</span> <span class="nf">test_get_contract_by_sales_contact_found</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">sample_contract</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l189">
+                  <tt><i>189</i> <span class="k">def</span> <span class="nf">test_get_contracts_by_client_id_no_contracts</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">capsys</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l209">
+                  <tt><i>209</i> <span class="k">def</span> <span class="nf">test_get_contracts_by_client_id_found</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">sample_contract</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l224">
+                  <tt><i>224</i> <span class="k">def</span> <span class="nf">test_update_contract_success</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">sample_contract</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l249">
+                  <tt><i>249</i> <span class="k">def</span> <span class="nf">test_update_contract_failure</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">,</span> <span class="n">capsys</span><span class="p">):</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l275">
+                  <tt><i>275</i> <span class="k">def</span> <span class="nf">test_close_user_controller</span><span class="p">(</span><span class="n">contract_controller</span><span class="p">,</span> <span class="n">mock_contract_dao</span><span class="p">):</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E266">
+               <span class="count sev-2">
+                  4
+               </span>
+               <strong>E266:</strong> too many leading '#' for block comment
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l113">
+                  <tt><i>113</i> <span class="c1">### **Tests pour `get_contract_by_id`**</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l150">
+                  <tt><i>150</i> <span class="c1">### **Tests pour `get_contract_by_sales_contact`**</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l186">
+                  <tt><i>186</i> <span class="c1">### **Tests pour `get_contracts_by_client_id`**</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l222">
+                  <tt><i>222</i> <span class="c1">### **Tests pour `update_contract`**</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="W293">
+               <span class="count sev-2">
+                  1
+               </span>
+               <strong>W293:</strong> blank line contains whitespace
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l283">
+                  <tt><i>283</i>   </tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="W391">
+               <span class="count sev-2">
+                  1
+               </span>
+               <strong>W391:</strong> blank line at end of file
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="tests.controllers.test_contract_controller.source.html#l284">
+                  <tt><i>284</i> &nbsp;</tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         </ul>
+      </div>
+   </body>
+</html>

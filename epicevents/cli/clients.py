@@ -9,10 +9,12 @@ from utils.logger import log_info, log_error, get_logger
 
 logger = get_logger('clients')
 
+
 @click.group()
 def clients():
     """Commandes pour gérer les clients."""
     pass
+
 
 @clients.command()
 @require_permission('can_create_clients')
@@ -40,9 +42,8 @@ def create(user_data):
         client = client_controller.create_client(client_data)  # Appel au contrôleur
 
         if client:
-           # Journaliser le succès
             log_info(
-                logger, 
+                logger,
                 f"Client créé avec succès : {client.fullname} (ID : {client.id}),\n"
                 f" Commercial : {client.sales_contact.fullname}"
                 )
@@ -91,12 +92,11 @@ def update_any_client(user_data):
         client = client_controller.get_client_by_id(client_id)
         if not client:
             raise ValueError("Client non trouvé.")
-        
 
         # Collecte des informations du client
         fullname = click.prompt('Nouveau nom complet', default=client.fullname)
         email = click.prompt('Nouvelle adresse email', default=client.email)
-        phone = click.prompt('Nouveau numéro de téléphone', default= client.phone)
+        phone = click.prompt('Nouveau numéro de téléphone', default=client.phone)
         company_name = click.prompt('Nouveau nom de l\'entreprise', default=client.company_name)
         sales_contact_id = click.prompt('Nouveau commercial', default=client.sales_contact_id)
 
@@ -110,7 +110,6 @@ def update_any_client(user_data):
 
         # Mettre à jour le client via le contrôleur
         updated_client = client_controller.update_client(client_id, client_data)
-        #client_controller.close()
 
         if updated_client:
             log_info(
@@ -130,7 +129,7 @@ def update_any_client(user_data):
             console.print(table)
         else:
             click.echo("Erreur lors de la mise à jour du client.")
-    
+
     except ValueError as e:
         click.echo(f"Erreur lors de la mise à jour du client : {e}")
     except Exception as e:
@@ -143,6 +142,7 @@ def update_any_client(user_data):
     finally:
         client_controller.close()
 
+
 @clients.command(name='update-own')
 @require_permission('can_modify_own_clients')
 def update_own_client(user_data):
@@ -154,22 +154,22 @@ def update_own_client(user_data):
     # Vérifier que le client appartient à l'utilisateur
     client_controller = ClientController()
 
-    try : 
+    try:
         client = client_controller.get_client_by_id(client_id)
         if not client:
             click.echo("Client non trouvé.")
             client_controller.close()
             return
-        
+
         if client.sales_contact_id != user_data['user_id']:
             click.echo("Vous n'êtes pas responsable de ce client.")
             client_controller.close()
             return
-        
+
         # Collecte des informations du client
         fullname = click.prompt('Nouveau nom complet', default=client.fullname)
         email = click.prompt('Nouvelle adresse email', default=client.email)
-        phone = click.prompt('Nouveau numéro de téléphone', default= client.phone)
+        phone = click.prompt('Nouveau numéro de téléphone', default=client.phone)
 
         client_data = {
             'fullname': fullname,
@@ -200,7 +200,7 @@ def update_own_client(user_data):
             console.print(table)
         else:
             click.echo("Erreur lors de la mise à jour du client.")
-    
+
     except ValueError as e:
         click.echo(f"Erreur lors de la mise à jour du client : {e}")
     except Exception as e:
@@ -212,6 +212,7 @@ def update_own_client(user_data):
         click.echo("Une erreur inattendue est survenue lors de la mise à jour du client.")
     finally:
         client_controller.close()
+
 
 @clients.command(name='delete-own')
 @require_permission('can_modify_own_clients')
@@ -226,7 +227,7 @@ def delete_own_client(user_data):
         client = client_controller.get_client_by_id(client_id)
         if not client:
             raise ValueError("Client non trouvé.")
-        
+
         if client.sales_contact_id != user_data['user_id']:
             raise ValueError("Vous n'êtes pas responsable de ce client.")
 
@@ -285,6 +286,7 @@ def delete_any_client():
     finally:
         client_controller.close()
 
+
 @clients.command()
 def list_clients():
     """
@@ -304,13 +306,13 @@ def list_clients():
     if not clients:
         click.echo("Aucun client trouvé.")
         return
-    
+
     console = Console()
     table = Table(
 
         title="[bold cyan]Tableau des clients[/]",
         show_header=True,
-        show_lines=True, 
+        show_lines=True,
         header_style="bold magenta")
     table.add_column("ID", style="dim")
     table.add_column("Nom")
@@ -323,7 +325,7 @@ def list_clients():
 
     for client in clients:
         table.add_row(
-            str(client.id), 
+            str(client.id),
             client.fullname,
             client.email or "",
             client.phone or "",
@@ -331,6 +333,6 @@ def list_clients():
             client.date_created.strftime("%d/%m/%Y %H:%M:%S"),
             client.date_updated.strftime("%d/%m/%Y %H:%M:%S"),
             client.sales_contact.fullname
-            
+
         )
     console.print(table)

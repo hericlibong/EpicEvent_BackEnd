@@ -59,6 +59,7 @@ L’application utilise des composants et bibliothèques de référence :
 
 
     ### Configuration de la Base de Données
+    ### **Option 1 : Utiliser la base de données existante**
 
     #### Connexion au Super-Utilisateur PostgreSQL
 
@@ -84,26 +85,22 @@ L’application utilise des composants et bibliothèques de référence :
     **Conseil** : Utilisez des identifiants simples, sans accents ni caractères spéciaux complexes. Par exemple :
 
     - Utilisateur : `epicenvents_user`
-    - Mot de passe : `MySecurePassword123` (pas d’accents, pas d’espaces)
+    - Mot de passe : `M0tD3P4ss3` (pas d’accents, pas d’espaces)
 
     #### Configurer le Fichier .env
 
-    Renommez le fichier d’exemple  fourni :
-
-    ```bash
-    cp .env_sample .env
-    ```
-
-    Ouvrez le fichier `.env` (situé dans le répertoire epicevents) et mettez à jour les variables :
+    Renommez le fichier d’exemple `.env_sample` en `.env`  (situé dans le répertoire epicevents) et mettez à jour les variables :
 
     ```env
     DB_USER=epicenvents_user
-    DB_PASSWORD=MySecurePassword123
+    DB_PASSWORD=M0tD3P4ss3
     DB_HOST=localhost
     DB_PORT=5432
     DB_NAME=epicevents_db
 
+    // Clé utilisée pour générer les tokens
     SECRET_KEY=my_secret_key
+    // Journalisation Sentry
     SENTRY_DSN=
     ```
 
@@ -118,6 +115,39 @@ L’application utilise des composants et bibliothèques de référence :
     ```
 
     Cette commande applique les migrations définies dans `alembic/versions` et crée les tables nécessaires dans la base de données `epicevents_db`.
+
+    ### **Option 2 : Créer une base de données personnalisée**
+1. Connectez-vous à PostgreSQL en tant que super-utilisateur :
+   ```bash
+   psql -U postgres
+   ```
+
+2. Créez une nouvelle base de données et un utilisateur associé :
+   ```sql
+   CREATE DATABASE nouvelle_base;
+   CREATE USER nouvel_utilisateur WITH PASSWORD 'mot_de_passe_securise';
+   GRANT ALL PRIVILEGES ON DATABASE nouvelle_base TO nouvel_utilisateur;
+   \q
+   ```
+
+3. Renommez et modifiez le fichier `.env` :
+  
+  Editez-le avec les informations de la nouvelle base :
+   
+   ```env
+   DB_USER=nouvel_utilisateur
+   DB_PASSWORD=mot_de_passe_securise
+   DB_HOST=localhost
+   DB_PORT=5432
+   DB_NAME=nouvelle_base
+
+   SECRET_KEY=une_nouvelle_cle_secrete
+   ```
+
+4. Initialisez la base de données :
+   ```bash
+   alembic upgrade head
+   ```
 
 ## Utilisation
 

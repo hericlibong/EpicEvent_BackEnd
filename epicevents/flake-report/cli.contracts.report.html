@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>flake8 violations: cli\contracts.py</title>
+      <meta http-equiv="Content-Type" value="text/html; charset=UTF-8">
+      <link rel="stylesheet" href="styles.css">
+<script>
+function bindHandler(link) {
+   var code = link.getAttribute('data-code');
+   var key = location.pathname + '#' + code;
+
+   var ul = link.parentNode.querySelector('.details');
+   if (sessionStorage[key] != 'open') {
+      ul.style.display = 'none';
+   }
+   link.addEventListener('click', function (event) {
+      if (!ul.style.display || ul.style.display == 'none') {
+         ul.style.display = 'block';
+         sessionStorage[key] = 'open';
+      } else {
+         ul.style.display = 'none';
+         sessionStorage[key] = 'closed';
+      }
+   });
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+   var links = document.querySelectorAll('#index > li > a');
+   for (var i = 0; i < links.length; i++) {
+      bindHandler(links[i]);
+   }
+});
+</script>
+   </head>
+   <body>
+      <div id="masthead" class="sev-2"></div>
+      <div id="page">
+         <p id="srclink">
+            <a title="View full annotated source"
+               href="cli.contracts.source.html">
+               <img src="file.svg" alt="&#x2261;">
+            </a></p>
+         <h1>
+            <a href="index.html">
+               <img src="back.svg" alt="&#x2B05;">
+               cli\contracts.py
+            </a>
+         </h1>
+
+         <ul id="index">
+         
+         <li>
+            <a data-code="E302">
+               <span class="count sev-2">
+                  4
+               </span>
+               <strong>E302:</strong> expected 2 blank lines, found 1
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.contracts.source.html#l18">
+                  <tt><i>18</i> <span class="nd">@contracts</span><span class="o">.</span><span class="n">command</span><span class="p">()</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l72">
+                  <tt><i>72</i> <span class="nd">@contracts</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;update&#39;</span><span class="p">)</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l160">
+                  <tt><i>160</i> <span class="nd">@contracts</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;list-contracts&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">])</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l229">
+                  <tt><i>229</i> <span class="nd">@contracts</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;delete&#39;</span><span class="p">)</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E265">
+               <span class="count sev-2">
+                  3
+               </span>
+               <strong>E265:</strong> block comment should start with '# '
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.contracts.source.html#l30">
+                  <tt><i>30</i>     <span class="c1">#sales_contact_id = click.prompt(&#39;ID du commercial&#39;, type=int)</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l37">
+                  <tt><i>37</i>         <span class="c1">#&#39;sales_contact_id&#39;: sales_contact_id</span></tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l146">
+                  <tt><i>146</i>             <span class="c1">#click.echo(f&quot;Contrat mis à jour avec succès : ID {updated_contract.id}&quot;)</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E501">
+               <span class="count sev-2">
+                  3
+               </span>
+               <strong>E501:</strong> line too long (129 > 120 characters)
+               
+                  (and 2 similar)
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <p>Line too long (129 > 120 characters):</p>
+               
+               <a href="cli.contracts.source.html#l127">
+                  <tt><i>127</i>                     <span class="sa">f</span><span class="s2">&quot;Contrat signé avec succès : ID </span><span class="si">{</span><span class="n">updated_contract</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> commercial: </span><span class="si">{</span><span class="n">updated_contract</span><span class="o">.</span><span class="n">sales_contact</span><span class="o">.</span><span class="n">fullname</span><span class="si">}</span><span class="s2">&quot;</span></tt>
+               </a>
+            </li><li>
+               
+               <p>Line too long (134 > 120 characters):</p>
+               
+               <a href="cli.contracts.source.html#l133">
+                  <tt><i>133</i>                     <span class="sa">f</span><span class="s2">&quot;Contrat mis à jour avec succès : ID </span><span class="si">{</span><span class="n">updated_contract</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> commercial: </span><span class="si">{</span><span class="n">updated_contract</span><span class="o">.</span><span class="n">sales_contact</span><span class="o">.</span><span class="n">fullname</span><span class="si">}</span><span class="s2">&quot;</span></tt>
+               </a>
+            </li><li>
+               
+               <p>Line too long (131 > 120 characters):</p>
+               
+               <a href="cli.contracts.source.html#l162">
+                  <tt><i>162</i> <span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;--status&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s1">&#39;signed&#39;</span><span class="p">,</span> <span class="s1">&#39;unsigned&#39;</span><span class="p">]),</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Filtrer par statut du contrat (&quot;signed&quot; ou &quot;unsigned&quot;)&#39;</span><span class="p">)</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="W291">
+               <span class="count sev-2">
+                  3
+               </span>
+               <strong>W291:</strong> trailing whitespace
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.contracts.source.html#l43">
+                  <tt><i>43</i>     <span class="k">try</span> <span class="p">:</span> </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l50">
+                  <tt><i>50</i>                 <span class="n">logger</span><span class="p">,</span> </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l65">
+                  <tt><i>65</i>             <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>  </tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="W293">
+               <span class="count sev-2">
+                  3
+               </span>
+               <strong>W293:</strong> blank line contains whitespace
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.contracts.source.html#l71">
+                  <tt><i>71</i>         </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l80">
+                  <tt><i>80</i>     </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l87">
+                  <tt><i>87</i>     </tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         <li>
+            <a data-code="E203">
+               <span class="count sev-2">
+                  2
+               </span>
+               <strong>E203:</strong> whitespace before ':'
+               
+            </a>
+            <ul class="details">
+            <li>
+               
+               <a href="cli.contracts.source.html#l43">
+                  <tt><i>43</i>     <span class="k">try</span> <span class="p">:</span> </tt>
+               </a>
+            </li><li>
+               
+               <a href="cli.contracts.source.html#l68">
+                  <tt><i>68</i>     <span class="k">except</span> <span class="ne">ValueError</span> <span class="p">:</span></tt>
+               </a>
+            </li>
+            </ul>
+         </li>
+         
+         </ul>
+      </div>
+   </body>
+</html>

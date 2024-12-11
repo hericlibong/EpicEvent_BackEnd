@@ -1,5 +1,4 @@
 import click
-import sentry_sdk
 from controllers.user_controller import UserController
 from models import Department
 from config import SessionLocal
@@ -10,10 +9,12 @@ from utils.logger import log_info, log_error, get_logger
 
 logger = get_logger('users')
 
+
 @click.group()
 def users():
     """Commandes pour gérer les utilisateurs."""
     pass
+
 
 @users.command(name='list-users')
 @require_permission('can_list_users')
@@ -32,9 +33,9 @@ def list(user_data):
 
         console = Console()
         table = Table(title="[bold cyan]Liste des utilisateurs[/]",
-                    show_header=True,
-                    show_lines=True,
-                    header_style="bold magenta")
+                      show_header=True,
+                      show_lines=True,
+                      header_style="bold magenta")
         table.add_column("ID", style="dim")
         table.add_column("Nom d'utilisateur")
         table.add_column("Nom complet")
@@ -56,9 +57,9 @@ def list(user_data):
             logger,
             "Liste des utilisateurs affichée avec succès."
         )
-        
+
         return "Success"
-        
+
     except Exception as e:
         # Capture de l'exception avec Sentry
         log_error(
@@ -66,10 +67,11 @@ def list(user_data):
             "Erreur lors de l'affichage de la liste des utilisateurs",
             exception=e
         )
-        
+
         click.echo("Une erreur inattendue est survenue.")
         return e
-  
+
+
 @users.command()
 @require_permission('can_manage_users')
 def create(user_data):
@@ -113,16 +115,16 @@ def create(user_data):
         # Enregistrer l'utilisateur via le contrôleur
         controller = UserController()
         try:
-            user = controller.register_user(user_data) # Vérifier l'argument de la fonction
+            user = controller.register_user(user_data)  # Vérifier l'argument de la fonction
             if user:
                 # Journaliser la création de l'utilisateur
                 log_info(
                     logger,
                     f"Utilisateur créé avec succès : {user.username}",
                     user_id=user.id,
-                    department = user.department.name
+                    department=user.department.name
                 )
-            
+
                 click.echo(f"Utilisateur créé avec succès : {user.username}")
                 console = Console()
                 table = Table(title="Utilisateur créé avec succès", show_header=False)
@@ -130,26 +132,20 @@ def create(user_data):
                 table.add_column("valeur", style="bold magenta")
                 table.add_row("ID", str(user.id))
                 table.add_row("Nom d'utilisateur", user.username)
-                table.add_row("Nom complet", user.fullname) 
+                table.add_row("Nom complet", user.fullname)
                 table.add_row("Email", user.email)
                 table.add_row("Téléphone", user.phone)
                 table.add_row("Département", user.department.name)
                 console.print(table)
             else:
                 click.echo("Erreur lors de la création de l'utilisateur.")
-        except Exception as e:   
-            
-            # Capture des erreurs inattendues
-            # log_error(
-            #     logger,
-            #     "Erreur lors de la création de l'utilisateur",
-            #     exception=e
-            # )
+        except Exception as e:
             click.echo(f"Erreur : {e}")
         finally:
             controller.close()
     finally:
         session.close()
+
 
 @users.command()
 @require_permission('can_manage_users')
@@ -169,7 +165,7 @@ def delete(user_data):
                 f"Utilisateur ID {user_id} : supprimé avec succès."
             )
             click.echo(f"Utilisateur ID {user_id} : supprimé avec succès.")
-        
+
         else:
             click.echo(f"Erreur : Utilisateur ID {user_id} introuvable ou non supprime*é.")
     except Exception as e:
@@ -193,7 +189,7 @@ def login(username, password):
         controller = UserController()
         token, result = controller.login_user(username, password)
         controller.close()
-        
+
         if token:
             log_info(
                 logger,
@@ -223,6 +219,7 @@ def login(username, password):
             exception=e
         )
         click.echo(f"Erreur : {e}")
+
 
 @users.command(name='update-users')
 @require_permission('can_manage_users')
@@ -264,7 +261,7 @@ def update(user_data):
     if not updates:
         click.echo("Aucune mise à jour demandée.")
         return
-    
+
     # Mettre à jour l'utilisateur via le contrôleur
     try:
         controller = UserController()
@@ -277,9 +274,9 @@ def update(user_data):
                 logger,
                 f"Utilisateur mis à jour : {user.username}",
                 user_id=user.id,
-                department = user.department.name
+                department=user.department.name
             )
-    
+
             click.echo(f"Utilisateur mis à jour avec succès : {user.username}")
             console = Console()
             table = Table(title="Utilisateur mis à jour avec succès", show_header=False)
@@ -287,7 +284,7 @@ def update(user_data):
             table.add_column("valeur", style="bold magenta")
             table.add_row("ID", str(user.id))
             table.add_row("Nom d'utilisateur", user.username)
-            table.add_row("Nom complet", user.fullname) 
+            table.add_row("Nom complet", user.fullname)
             table.add_row("Email", user.email)
             table.add_row("Téléphone", user.phone)
             table.add_row("Département", user.department.name)
@@ -304,13 +301,14 @@ def update(user_data):
         click.echo(f"Erreur : {e}")
 
 
-### Sous-groupe pour les tests
+# Sous-groupe pour les tests
 @users.group(name='TESTS')
 def tests():
     """Commandes pour tester les exceptions."""
     pass
 
-### Commandes de tests
+
+# Commandes de tests
 @tests.command(name='test-exception')
 def test_exception():
     """Commande pour tester une exception générique."""
@@ -319,6 +317,7 @@ def test_exception():
         controller.trigger_exception()
     except Exception as e:
         click.echo(f"Exception capturée : {e}")
+
 
 @tests.command(name='test-value-error')
 def test_value_exception():
@@ -329,6 +328,7 @@ def test_value_exception():
     except Exception as e:
         click.echo(f"Exception capturée : {e}")
 
+
 @tests.command(name='test-key-error')
 def test_key_exception():
     """Commande pour tester une KeyError."""
@@ -337,6 +337,7 @@ def test_key_exception():
         controller.trigger_key_error()
     except Exception as e:
         click.echo(f"Exception capturée : {e}")
+
 
 @tests.command(name='test-type-error')
 def test_type_exception():
@@ -347,6 +348,7 @@ def test_type_exception():
     except Exception as e:
         click.echo(f"Exception capturée : {e}")
 
+
 @tests.command(name='test-io-error')
 def test_io_exception():
     """Commande pour tester une IOError."""
@@ -356,6 +358,7 @@ def test_io_exception():
     except Exception as e:
         click.echo(f"Exception capturée : {e}")
 
+
 @tests.command(name='test-attribute-error')
 def test_attribute_exception():
     """Commande pour tester une AttributeError."""
@@ -364,6 +367,7 @@ def test_attribute_exception():
         controller.trigger_attribute_error()
     except Exception as e:
         click.echo(f"Exception capturée : {e}")
+
 
 @tests.command(name='test-index-error')
 def test_index_exception():
