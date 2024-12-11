@@ -9,4 +9,4 @@ epicevents/.coverage
 epicevents/.pytest_cache/
 epicevents/test_connexion.py
 epicevents/create_tables.py
-epicevents/flake-report
+epicevents/flake-report/
