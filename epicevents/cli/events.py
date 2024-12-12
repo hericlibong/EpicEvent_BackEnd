@@ -4,10 +4,12 @@ from rich.console import Console
 from rich.table import Table
 from controllers.event_controller import EventController
 from controllers.user_controller import UserController
-from controllers.client_controller import ClientController
-from controllers.contract_controller import ContractController
 from utils.decorators import require_permission
 from utils.logger import get_logger, log_info, log_error
+
+
+logger = get_logger('events')
+
 
 @click.group()
 def events():
@@ -31,7 +33,7 @@ def create(user_data):
         # et validera les dates.
         
         name = click.prompt('Nom de l\'évènement', default='')
-        event_date_start_str = click.prompt('Date de début (JJ/MM/AAAA HH:MM)', type=str)
+        event_date_start_str = click.prompt('Date de début (JJ/MM/AAAA)', type=str)
         event_date_end_str = click.prompt('Date de fin (JJ/MM/AAAA HH:MM)', type=str)
         location = click.prompt('Lieu', default='')
         attendees = click.prompt('Nombre de participants', type=int, default=0)
@@ -51,7 +53,7 @@ def create(user_data):
 
         if event:
             # Journaliser le succès
-            log_info(get_logger('events'), f"Evènement créé avec succès : ID {event.id}")
+            log_info(logger, f"Evènement créé avec succès : ID {event.id}")
             
             console = Console()
             table = Table(title="Evènement créé avec succès", show_header=False)
@@ -60,7 +62,7 @@ def create(user_data):
             table.add_row("ID", str(event.id))
             table.add_row("Nom de l'évènement", event.name)
             table.add_row("Numéro de contrat", str(event.contract_id))
-            table.add_row("Date de début", event.event_date_start.strftime("%d/%m/%Y %H:%M"))
+            table.add_row("Date de début", event.event_date_start.strftime("%d/%m/%Y"))
             table.add_row("Date de fin", event.event_date_end.strftime("%d/%m/%Y %H:%M"))
             table.add_row("Lieu", event.location)
             table.add_row("Nombre de participants", str(event.attendees))
@@ -74,82 +76,15 @@ def create(user_data):
         click.echo(f"Erreur: {ve}")
     except Exception as e:
         # Erreur inattendue
-        log_error(get_logger('events'), f"Erreur inattendue lors de la création de l'évènement : {str(e)}")
+        log_error(logger, f"Erreur inattendue lors de la création de l'évènement : {str(e)}")
         click.echo("Erreur inattendue lors de la création de l'évènement.")
 
     event_controller.close()
 
 
-# @events.command(name='update')
-# @require_permission('can_modify_own_events', 'can_modify_all_events')
-# def update(user_data, user_permisions):
-#     """
-#     Mettre à jour un évènement dont vous êtes responsable.
-#     """
-#     event_id = click.prompt('ID de l\'évènement à mettre à jour', type=int)
-
-#     event_controller = EventController()
-#     event = event_controller.get_event_by_id(event_id)
-#     if not event:
-#         click.echo("Evènement introuvable.")
-#         event_controller.close()
-#         return
-    
-#     # Vérifier si l'utilisateur a la permission de modifier tous les évènements
-#     user_id = user_data.get('user_id')
-#     if 'can_modify_all_events' in user_permisions:
-#         # L'utilisateur a la permission de modifier tous les évènements
-#         pass
-#     elif 'can_modify_own_events' in user_permisions:
-#         # Vérifier que l'évènement appartient à l'utilisateur
-#         if event.support_contact_id != user_id:
-#             click.echo("Vous n'êtes pas responsable de cet évènement. Impossible de le modifier.")
-#             event_controller.close()
-#             return
-#     else:
-#         click.echo("Vous n'êtes pas autorisé à modifier les évènements.")
-#         event_controller.close()
-#         return
-    
-#     # Collecte les nouvelles informations
-#     name = click.prompt('Nouveau nom', default=event.name)
-#     support_contact_id = click.prompt('ID du nouveau contact support', type=int)
-#     event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA)', default=event.event_date_start.strftime("%d/%m/%Y"))
-#     event_date_end_str = click.prompt('Nouvelle date de fin (JJ/MM/AAAA)', default=event.event_date_end.strftime("%d/%m/%Y"))
-#     location = click.prompt('Nouveau lieu', default=event.location)
-#     attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)   
-#     notes = click.prompt('Nouvelles notes', default=event.notes)
-
-#     event_data = {
-#         'name': name,
-#         'support_contact_id': support_contact_id,
-#         'event_date_start_str': event_date_start_str,
-#         'event_date_end_str': event_date_end_str,
-#         'location': location,
-#         'attendees': attendees,
-#         'notes': notes
-#     }
-
-#     try:
-#         updated_event = event_controller.update_event(event_id, event_data)
-#         if updated_event:
-#             log_info(get_logger('events'), f"Evènement mis à jour: ID {updated_event.id}")
-#             click.echo(f"Evènement mis à jour avec succès : ID {updated_event.id}")
-#         else:
-#             click.echo("Erreur lors de la mise à jour de l'évènement.")
-#     except ValueError as ve:
-#         # Erreur métier
-#         click.echo(f"Erreur: {ve}")
-#     except Exception as e:
-#         # Erreur inattendue
-#         log_error(get_logger('events'), f"Erreur inattendue lors de la mise à jour de l'évènement : {str(e)}")
-#         click.echo("Erreur inattendue lors de la mise à jour de l'évènement.")
-
-#     event_controller.close()
-
 @events.command(name='update-own')
 @require_permission('can_modify_own_events')
-def update(user_data):
+def update_own(user_data):
     """
     Mettre à jour un évènement dont vous êtes responsable.
     """
@@ -167,10 +102,10 @@ def update(user_data):
         click.echo("Vous n'êtes pas responsable de cet évènement. Impossible de le modifier.")
         event_controller.close()
         return
-    
+
     # Collecte les nouvelles informations
     name = click.prompt('Nouveau nom', default=event.name)
-    event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA HH:MM)', default=event.event_date_start.strftime("%d/%m/%Y %H:%M"))
+    event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA)', default=event.event_date_start.strftime("%d/%m/%Y"))
     event_date_end_str = click.prompt('Nouvelle date de fin (JJ/MM/AAAA HH:MM)', default=event.event_date_end.strftime("%d/%m/%Y %H:%M"))
     location = click.prompt('Nouveau lieu', default=event.location)
     attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)   
@@ -188,7 +123,7 @@ def update(user_data):
     try:
         updated_event = event_controller.update_event(event_id, event_data)
         if updated_event:
-            log_info(get_logger('events'), f"Evènement mis à jour: ID {updated_event.id}")
+            log_info(logger, f"Evènement mis à jour: ID {updated_event.id}")
             click.echo(f"Evènement mis à jour avec succès : ID {updated_event.id}")
         else:
             click.echo("Erreur lors de la mise à jour de l'évènement.")
@@ -197,12 +132,63 @@ def update(user_data):
         click.echo(f"Erreur: {ve}")
     except Exception as e:
         # Erreur inattendue
-        log_error(get_logger('events'), f"Erreur inattendue lors de la mise à jour de l'évènement : {str(e)}")
+        log_error(logger, f"Erreur inattendue lors de la mise à jour de l'évènement : {str(e)}")
         click.echo("Erreur inattendue lors de la mise à jour de l'évènement.")
 
     event_controller.close()
 
-    
+
+@events.command(name='update-all')
+@require_permission('can_modify_all_events')
+def update_all(user_data):
+    """
+    Mettre à jour un évènement.
+    """
+    event_id = click.prompt('ID de l\'évènement à mettre à jour', type=int)
+
+    event_controller = EventController()
+    event = event_controller.get_event_by_id(event_id)
+    if not event:
+        click.echo("Evènement introuvable.")
+        event_controller.close()
+        return
+
+    # Collecte les nouvelles informations
+    name = click.prompt('Nouveau nom', default=event.name)
+    support_contact_id = click.prompt('ID du nouveau contact support', type=int, default=event.support_contact_id)
+    event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA)', default=event.event_date_start.strftime("%d/%m/%Y"))
+    event_date_end_str = click.prompt('Nouvelle date de fin (JJ/MM/AAAA)', default=event.event_date_end.strftime("%d/%m/%Y"))
+    location = click.prompt('Nouveau lieu', default=event.location)
+    attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)   
+    notes = click.prompt('Nouvelles notes', default=event.notes)
+
+    event_data = {
+        'name': name,
+        'support_contact_id': support_contact_id,
+        'event_date_start_str': event_date_start_str,
+        'event_date_end_str': event_date_end_str,
+        'location': location,
+        'attendees': attendees,
+        'notes': notes
+    }
+
+    try:
+        updated_event = event_controller.update_event(event_id, event_data)
+        if updated_event:
+            log_info(logger, f"Evènement mis à jour: ID {updated_event.id}")
+            click.echo(f"Evènement mis à jour avec succès : ID {updated_event.id}")
+        else:
+            click.echo("Erreur lors de la mise à jour de l'évènement.")
+    except ValueError as ve:
+        # Erreur métier
+        click.echo(f"Erreur: {ve}")
+    except Exception as e:
+        # Erreur inattendue
+        log_error(logger, f"Erreur inattendue lors de la mise à jour de l'évènement : {str(e)}")
+        click.echo("Erreur inattendue lors de la mise à jour de l'évènement.")
+
+    event_controller.close()
+
 
 @events.command()
 @require_permission('can_assign_support')
@@ -216,10 +202,10 @@ def assign_support(user_data): # Pourquoi user_data en argument alors qu'il n'es
     event_controller = EventController()
     success = event_controller.assign_support(event_id, support_user_id)
     event_controller.close()
-    
+
     if success:
         # Journaliser le succès
-        log_info(get_logger('events'), f"Contact support assigné à l'événement ID {event_id}")
+        log_info(logger, f"Contact support assigné à l'événement ID {event_id}")
         click.echo(f"Contact support assigné avec succès à l'événement ID {event_id}")
         console = Console()
         table = Table(title="Contact support assigné avec succès", show_header=False)
@@ -231,7 +217,6 @@ def assign_support(user_data): # Pourquoi user_data en argument alors qu'il n'es
         console.print(table)
     else:
         click.echo("Erreur lors de l'assignation du contact support.")
-
 
 
 
@@ -260,13 +245,13 @@ def list_filtered_events(user_data, no_support):
         click.echo("Accès refusé. Vous n'êtes pas autorisé à accéder à cette commande.")
         event_controller.close()
         return
-    
+
     event_controller.close()  # Pourquoi fermer une seconde fois?
 
     if not events:
         click.echo("Aucun événement trouvé.")
         return
-    
+
     # Afficher les évènements avec Rich
     console = Console()
     table = Table(
@@ -307,6 +292,7 @@ def list_filtered_events(user_data, no_support):
         )
     console.print(table)
 
+
 @events.command(name='list-all')
 def list_all_events():
     """
@@ -327,7 +313,7 @@ def list_all_events():
     if not events:
         click.echo("Aucun événement trouvé.")
         return
-    
+
     console = Console()
     table = Table(
         title="[bold cyan]Tableau des Evènements[/]",
@@ -366,4 +352,3 @@ def list_all_events():
             event.date_updated.strftime("%d/%m/%Y %H:%M")
         )
     console.print(table)
-        
