@@ -12,4 +12,3 @@ epicevents/create_tables.py
 epicevents/flake-report/
 flake-report/
 tests/controllers/
-tests/test_security.py
