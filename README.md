@@ -227,7 +227,9 @@ Ce diagramme montre les entités suivantes :
 - `events` : Événements organisés pour les clients, liés aux contrats signés.
 - `departments` : Représente les départements au sein de l'organisation.
 
+## Structure et architecture
 
+Pour une description de l'architecture de l'application, consultez le dossier [docs](https://github.com/hericlibong/EpicEvent_BackEnd/blob/main/docs/structure.md).
 
 
 
