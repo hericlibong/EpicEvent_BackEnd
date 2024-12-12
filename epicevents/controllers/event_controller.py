@@ -138,8 +138,9 @@ class EventController:
             raise ValueError("Utilisateur de support introuvable.")
 
         # Vérifier que l'utilisateur appartient au département de support
-        if support_user.department.lower() != 'support':
+        if support_user.department.name.strip().lower() != 'support':
             raise ValueError("Utilisateur n'appartient pas au département de support.")
+
 
         # Si l'utilisateur est bien du support, assigner le support à l'événement
         event = self.event_dao.assign_support(event_id, support_user_id)
