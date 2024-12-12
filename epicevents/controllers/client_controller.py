@@ -19,8 +19,7 @@ class ClientController:
             print("Aucun client trouvé.")
             return
         return clients
-    
-    #@log_exceptions('controller')
+
     def create_client(self, client_data):
         """
         Créer un nouveau client.
@@ -34,11 +33,10 @@ class ClientController:
             raise ValueError("Le numéro de téléphone est obligatoire.")
         if not client_data.get('company_name'):
             raise ValueError("Le nom de l'entreprise est obligatoire.")
-        
-        client = self.client_dao.create_client(client_data)       
+
+        client = self.client_dao.create_client(client_data)
         return client
-        
-            
+
     @log_exceptions('controller')
     def get_client_by_id(self, client_id):
         """
@@ -49,7 +47,7 @@ class ClientController:
             print("Aucun client trouvé.")
             return None
         return client
-    
+
     @log_exceptions('controller')
     def update_client(self, client_id, client_data):
         """
@@ -60,9 +58,9 @@ class ClientController:
             print("Aucun client trouvé ou erreur lors de la mise à jour.")
             return None
         return client
-              
+
     @log_exceptions('controller')
-    def get_clients_by_sales_contact(self, sales_contact_id):     
+    def get_clients_by_sales_contact(self, sales_contact_id):
         """
         Récupérer tous les clients d'un contact commercial.
         """
@@ -71,7 +69,7 @@ class ClientController:
             print("Aucun client trouvé.")
             return None
         return clients
-    
+
     @log_exceptions('controller')
     def delete_client(self, client_id):
         """
@@ -79,7 +77,7 @@ class ClientController:
         """
         result = self.client_dao.delete_client(client_id)
         return result
-    
+
     @log_exceptions('controller')
     def close(self):
         self.client_dao.close()

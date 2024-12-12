@@ -2,6 +2,7 @@ from dao.user_dao import UserDAO
 from utils.security import hash_password, create_access_token, verify_password, verify_access_token
 from utils.logger import get_logger, log_error
 
+
 class UserController:
     def __init__(self):
         self.user_dao = UserDAO()
@@ -53,10 +54,10 @@ class UserController:
         user = self.user_dao.get_user_by_username(username)
         if not user:
             return None, "Utilisateur non trouvé."
-        
+
         if not verify_password(password, user.hashed_password):
             return None, "Mot de passe incorrect."
-        
+
         # Générer un token d'accès
         token_data = {
             'user_id': user.id,
@@ -65,7 +66,7 @@ class UserController:
         }
         token = create_access_token(token_data)
         return token, user
-    
+
     def get_user(self, user_id):
         """
         Récupérer un utilisateur par son identifiant.
@@ -75,7 +76,7 @@ class UserController:
         if not user:
             raise ValueError("Utilisateur non trouvé.")
         return user
-    
+
     def get_users_list(self):
         """
         Récupérer tous les utilisateurs.
@@ -86,7 +87,7 @@ class UserController:
             # Pas d'erreur métier, juste aucun utilisateur.
             return []
         return users
-    
+
     def update_user(self, user_id, user_data):
         """
         Mettre à jour un utilisateur avec les données fournies.
@@ -104,7 +105,7 @@ class UserController:
             # Erreur inattendue
             log_error(self.logger, "Erreur inattendue lors de la mise à jour de l'utilisateur", exception=e)
             raise Exception("Erreur lors de la mise à jour de l'utilisateur") from e
-    
+
     def delete_user(self, user_id):
         """
         Supprimer un utilisateur par son identifiant.

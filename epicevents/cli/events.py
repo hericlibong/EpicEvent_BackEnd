@@ -31,7 +31,7 @@ def create(user_data):
         # si le commercial responsable correspond à l'utilisateur,
         # si un event existe déjà pour ce contrat,
         # et validera les dates.
-        
+
         name = click.prompt('Nom de l\'évènement', default='')
         event_date_start_str = click.prompt('Date de début (JJ/MM/AAAA)', type=str)
         event_date_end_str = click.prompt('Date de fin (JJ/MM/AAAA HH:MM)', type=str)
@@ -54,7 +54,7 @@ def create(user_data):
         if event:
             # Journaliser le succès
             log_info(logger, f"Evènement créé avec succès : ID {event.id}")
-            
+
             console = Console()
             table = Table(title="Evènement créé avec succès", show_header=False)
             table.add_column("champ", style="bold cyan")
@@ -108,7 +108,7 @@ def update_own(user_data):
     event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA)', default=event.event_date_start.strftime("%d/%m/%Y"))
     event_date_end_str = click.prompt('Nouvelle date de fin (JJ/MM/AAAA HH:MM)', default=event.event_date_end.strftime("%d/%m/%Y %H:%M"))
     location = click.prompt('Nouveau lieu', default=event.location)
-    attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)   
+    attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)
     notes = click.prompt('Nouvelles notes', default=event.notes)
 
     event_data = {
@@ -159,7 +159,7 @@ def update_all(user_data):
     event_date_start_str = click.prompt('Nouvelle date de début (JJ/MM/AAAA)', default=event.event_date_start.strftime("%d/%m/%Y"))
     event_date_end_str = click.prompt('Nouvelle date de fin (JJ/MM/AAAA)', default=event.event_date_end.strftime("%d/%m/%Y"))
     location = click.prompt('Nouveau lieu', default=event.location)
-    attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)   
+    attendees = click.prompt('Nouveau nombre participants', type=int, default=event.attendees)
     notes = click.prompt('Nouvelles notes', default=event.notes)
 
     event_data = {
@@ -192,13 +192,12 @@ def update_all(user_data):
 
 @events.command()
 @require_permission('can_assign_support')
-def assign_support(user_data): # Pourquoi user_data en argument alors qu'il n'est pas appelé?
+def assign_support(user_data):  # Pourquoi user_data en argument alors qu'il n'est pas appelé?
     """
     Assigner un contact support à un événement.
     """
     event_id = click.prompt('ID de l\'événement à mettre à jour', type=int)
     support_user_id = click.prompt('ID du contact support', type=int)
-
     event_controller = EventController()
     success = event_controller.assign_support(event_id, support_user_id)
     event_controller.close()
@@ -213,17 +212,16 @@ def assign_support(user_data): # Pourquoi user_data en argument alors qu'il n'es
         table.add_column("valeur", style="bold magenta")
         table.add_row("ID de l'événement", str(event_id))
         table.add_row("ID du contact support", str(support_user_id))
-        table.add_row("Nom du contact support", event_controller.get_events_by_support(support_user_id)[0].support_contact.fullname) 
+        table.add_row("Nom du contact support", event_controller.get_events_by_support(support_user_id)[0].support_contact.fullname)
         console.print(table)
     else:
         click.echo("Erreur lors de l'assignation du contact support.")
 
 
-
 # Commandes pour filtrer les évènements pour le support et la gestion
 @events.command(name='list-filtered')
 @require_permission('can_filter_events')
-@click.option('--no-support', is_flag=True, help='Afficher uniquement les événements sans contact support') 
+@click.option('--no-support', is_flag=True, help='Afficher uniquement les événements sans contact support')
 def list_filtered_events(user_data, no_support):
     """
     Afficher la liste des événements filtrés par le support.
@@ -279,8 +277,10 @@ def list_filtered_events(user_data, no_support):
             event.name or "N/A",
             str(event.contract_id),
             event.contract.client.fullname if event.contract and event.contract.client else "Non défini",
-            (f"Email:{event.contract.client.email or 'N/A'} | tel:{event.contract.client.phone or 'N/A'}"
-            if event.contract and event.contract.client else "Non défini"),
+            (
+                f"Email:{event.contract.client.email or 'N/A'} | tel:{event.contract.client.phone or 'N/A'}"
+                if event.contract and event.contract.client else "Non défini"
+            ),
             event.event_date_start.strftime("%d/%m/%Y %H:%M") if event.event_date_start else "N/A",
             event.event_date_end.strftime("%d/%m/%Y %H:%M") if event.event_date_end else "N/A",
             event.support_contact.fullname if event.support_contact else "Non défini",
@@ -317,7 +317,7 @@ def list_all_events():
     console = Console()
     table = Table(
         title="[bold cyan]Tableau des Evènements[/]",
-        show_header=True, 
+        show_header=True,
         show_lines=True,
         header_style="bold magenta")
     table.add_column("ID", style="dim")
@@ -340,8 +340,10 @@ def list_all_events():
             event.name or "N/A",
             str(event.contract_id),
             event.contract.client.fullname if event.contract and event.contract.client else "Non défini",
-            (f"Email:{event.contract.client.email or 'N/A'} | tel:{event.contract.client.phone or 'N/A'}"
-            if event.contract and event.contract.client else "Non défini"),
+            (
+                f"Email:{event.contract.client.email or 'N/A'} | tel:{event.contract.client.phone or 'N/A'}"
+                if event.contract and event.contract.client else "Non défini"
+            ),
             event.event_date_start.strftime("%d/%m/%Y %H:%M") if event.event_date_start else "N/A",
             event.event_date_end.strftime("%d/%m/%Y %H:%M") if event.event_date_end else "N/A",
             event.support_contact.fullname if event.support_contact else "Non défini",

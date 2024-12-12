@@ -7,6 +7,7 @@ from controllers.user_controller import UserController
 from utils.decorators import require_permission
 from utils.logger import log_info, log_error, get_logger
 
+
 logger = get_logger('clients')
 
 

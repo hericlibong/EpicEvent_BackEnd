@@ -2,8 +2,6 @@ from functools import wraps  # Import nécessaire
 from utils.logger import log_error, get_logger
 
 
-
-# Décorateur pour vérifier les exceptions
 def log_exceptions(logger_name):
     def decorator(func):
         @wraps(func)

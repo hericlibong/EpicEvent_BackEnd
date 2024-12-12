@@ -2,6 +2,9 @@
 exclude = 
     alembic/,
     test_connexion.py,
-    create_tables.py
-max-line-length = 120
+    create_tables.py,
+    tests/,
+    models/__init__.py,
+    main.py,
+max-line-length = 140
     

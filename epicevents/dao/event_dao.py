@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 logger = get_logger('events')
 
+
 class EventDAO(BaseDAO):
 
     def create_event(self, event_data):

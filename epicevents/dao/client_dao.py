@@ -7,33 +7,33 @@ import sqlite3
 from utils.log_decorator import log_exceptions
 from utils.logger import get_logger, log_error
 
+
 class ClientDAO(BaseDAO):
     def __init__(self):
         super().__init__()
         self.logger = get_logger('dao')
 
-    
     def create_client(self, client_data):
         """
         Crée un client avec les données fournies.
         """
         client = Client(**client_data)
         self.session.add(client)
-        
+
         try:
             self.session.commit()
 
             # Recharger le client avec les relations nécessaires
             client = self.session.query(Client).options(
-                    joinedload(Client.sales_contact),
-                    # Ajoutez d'autres relations que vous souhaitez charger
+                joinedload(Client.sales_contact),
+                # Ajoutez d'autres relations que vous souhaitez charger
             ).filter_by(id=client.id).one()
 
             # Détacher l'objet de la session
             self.session.expunge(client)
 
             return client
-        
+
         except IntegrityError as e:
             self.session.rollback()
 
@@ -61,7 +61,7 @@ class ClientDAO(BaseDAO):
                 "Erreur d'intégrité non gérée."
             )
             raise Exception("Erreur d'intégrité non gérée.") from e
-        
+
         except Exception as e:
             # Tout autre erreur inattendue qui n'est pas IntegrityError
             log_error(
@@ -78,7 +78,7 @@ class ClientDAO(BaseDAO):
         """
         self.logger.info(f"fetching client by id: {client_id}")
         return self.session.query(Client).filter_by(id=client_id).first()
-    
+
     @log_exceptions('dao')
     def get_all_clients(self):
         """
@@ -86,7 +86,7 @@ class ClientDAO(BaseDAO):
         """
         self.logger.info("fetching all clients ...")
         return self.session.query(Client).all()
-    
+
     @log_exceptions('dao')
     def update_client(self, client_id: int, client_data: dict):
         """
@@ -100,7 +100,7 @@ class ClientDAO(BaseDAO):
         self.session.commit()
         self.session.refresh(client)
         return client
-    
+
     @log_exceptions('dao')
     def get_clients_by_sales_contact(self, sales_contact_id: int):
         """
@@ -108,7 +108,7 @@ class ClientDAO(BaseDAO):
         """
         self.logger.info(f"fetching clients by sales contact: {sales_contact_id}")
         return self.session.query(Client).filter_by(sales_contact_id=sales_contact_id).all()
-    
+
     @log_exceptions('dao')
     def get_client_by_email(self, email: str):
         """
@@ -116,7 +116,7 @@ class ClientDAO(BaseDAO):
         """
         self.logger.info(f"fetching client by email: {email}")
         return self.session.query(Client).filter_by(email=email).first()
-    
+
     @log_exceptions('dao')
     def delete_client(self, client_id: int):
         """

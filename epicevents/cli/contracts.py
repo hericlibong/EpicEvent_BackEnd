@@ -7,6 +7,7 @@ from utils.decorators import require_permission
 from click_aliases import ClickAliasedGroup
 from utils.logger import get_logger, log_info, log_error
 
+
 logger = get_logger('contracts')
 
 
@@ -15,60 +16,56 @@ def contracts():
     """Commandes pour gérer les contrats."""
     pass
 
+
 @contracts.command()
 @require_permission('can_create_contracts')
 def create(user_data):
     """
     Créer un nouveau contrat
     """
-
     # Collecte des informations du contrat
     client_id = click.prompt('ID du client', type=int)
     amount = click.prompt('Montant total', type=float)
     remaining_amount = click.prompt('Montant restant', type=float)
     status = click.prompt('Statut (1 pour signé, 0 pour en attente)', type=int)
-    #sales_contact_id = click.prompt('ID du commercial', type=int)
 
     contract_data = {
         'client_id': client_id,
         'amount': amount,
         'remaining_amount': remaining_amount,
         'status': bool(status),
-        #'sales_contact_id': sales_contact_id
     }
 
     # Créer le contrat via le contrôleur
     contract_controller = ContractController()
 
-    try : 
+    try:
         contract = contract_controller.create_contract(contract_data)
         contract_controller.close()
 
         if contract:
             # Journalisation du contrat créé
             log_info(
-                logger, 
+                logger,
                 f"Contrat créé avec succès : ID {contract.id} commercial: {contract.sales_contact.fullname}"
                 )
-
             console = Console()
             table = Table(title="Contrat créé avec succès", show_header=False)
-
             table.add_column("champ", style="bold cyan")
             table.add_column("valeur", style="bold magenta")
-
             table.add_row("ID", str(contract.id))
             table.add_row("Client", contract.client.fullname)
             table.add_row("Montant total", str(contract.amount))
             table.add_row("Montant restant", str(contract.remaining_amount))
             table.add_row("Commercial", contract.sales_contact.fullname)
-            console.print(table)  
+            console.print(table)
         else:
             click.echo("Erreur lors de la création du contrat.")
-    except ValueError :
+    except ValueError:
         click.echo("Erreur lors de la création du contrat.")
         contract_controller.close()
-        
+
+
 @contracts.command(name='update')
 @require_permission('can_modify_all_contracts', 'can_modify_own_contracts')
 def update_contract(user_data, user_permissions):
@@ -77,14 +74,14 @@ def update_contract(user_data, user_permissions):
     """
     contract_id = click.prompt('ID du contrat à mettre à jour', type=int)
     contract_controller = ContractController()
-    
+
     # Récupérer le contrat par ID pour connaître l'ancien statut
     contract = contract_controller.get_contract_by_id(contract_id)
     if not contract:
         click.echo("Contrat introuvable.")
         contract_controller.close()
         return
-    
+
     old_status = contract.status
 
     # Vérifier les permissions de l'utilisateur
@@ -143,7 +140,6 @@ def update_contract(user_data, user_permissions):
             table.add_row("Montant restant", str(updated_contract.remaining_amount))
             table.add_row("Commercial", updated_contract.sales_contact.fullname)
             console.print(table)
-            #click.echo(f"Contrat mis à jour avec succès : ID {updated_contract.id}")
         else:
             click.echo("Erreur lors de la mise à jour du contrat.")
     except ValueError as ve:
@@ -155,6 +151,7 @@ def update_contract(user_data, user_permissions):
         log_error(logger, f"Erreur inattendue lors de la mise à jour du contrat : {str(e)}")
         click.echo("Erreur lors de la mise à jour du contrat.")
         contract_controller.close()
+
 
 # Commande pour lister tous les contrats
 @contracts.command(name='list-contracts', aliases=[''])
@@ -225,6 +222,7 @@ def list_contracts(user_data, status, payment, own):
             "Signé" if contract.status else "En attente"
         )
     console.print(table)
+
 
 @contracts.command(name='delete')
 @require_permission('can_delete_contracts')

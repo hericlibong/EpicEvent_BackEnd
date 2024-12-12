@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class User(Base):
-    __tablename__ ='users'
+    __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, unique=True, index=True, nullable=False)
@@ -16,7 +16,6 @@ class User(Base):
     department_id = Column(Integer, ForeignKey('departments.id'), nullable=False)
     date_created = Column(DateTime, default=datetime.now)
     date_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
 
     # Relations
     clients = relationship('Client', back_populates='sales_contact', cascade='all, delete-orphan')

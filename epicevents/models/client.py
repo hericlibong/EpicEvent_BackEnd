@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from .base import Base
 from datetime import datetime
 
+
 class Client(Base):
     __tablename__ = 'clients'
 

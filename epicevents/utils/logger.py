@@ -16,11 +16,13 @@ console_handler.setFormatter(formatter)
 # Ajouter le handler au logger
 parent_logger.addHandler(console_handler)
 
+
 def get_logger(name):
     """
     Récupérer un logger spécifique.
     """
     return logging.getLogger(f'epicevents.{name}')
+
 
 def log_info(logger, message, **kwargs):
     """
@@ -31,6 +33,7 @@ def log_info(logger, message, **kwargs):
         for key, value in kwargs.items():
             scope.set_extra(key, value)
         sentry_sdk.capture_message(message, level="info")
+
 
 def log_error(logger, message, exception=None, **kwargs):
     """

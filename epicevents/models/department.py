@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from .base import Base
 
+
 class Department(Base):
     """
     Department model representing a department within an organization.

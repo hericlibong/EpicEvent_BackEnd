@@ -26,6 +26,7 @@ DEPARTMENT_PERMISSIONS = {
     },
 }
 
+
 def has_permission(user_department, permission):
     """
     Vérifie si l'utilisateur a les permissions requises pour effectuer une action.

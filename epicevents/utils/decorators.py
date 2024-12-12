@@ -38,13 +38,11 @@ def require_permission(*permissions):
                     level='warning'
                     )
                 return
-            
+
             sig = inspect.signature(f)
             if 'user_permissions' in sig.parameters:
                 return f(user_data, user_permissions, *args, **kwargs)
             else:
                 return f(user_data, *args, **kwargs)
         return wrapper
-    return decorator 
-
-
+    return decorator

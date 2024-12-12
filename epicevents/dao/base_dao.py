@@ -1,5 +1,6 @@
 from config import SessionLocal as Session
 
+
 class BaseDAO:
     def __init__(self):
         self.session = Session()
@@ -10,6 +11,6 @@ class BaseDAO:
         except Exception as e:
             self.session.rollback()
             raise e
-        
+
     def close(self):
         self.session.close()

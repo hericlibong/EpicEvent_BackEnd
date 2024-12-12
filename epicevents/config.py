@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+
 def get_database_url():
     load_dotenv()
     db_user = os.getenv('DB_USER')
@@ -15,6 +16,7 @@ def get_database_url():
         raise ValueError("Certaines variables d'environnement sont manquantes.")
 
     return f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
+
 
 DATABASE_URL = get_database_url()
 engine = create_engine(DATABASE_URL)

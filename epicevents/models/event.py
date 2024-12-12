@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from .base import Base
 from datetime import datetime
 
+
 class Event(Base):
     __tablename__ = 'events'
 
@@ -18,9 +19,5 @@ class Event(Base):
     date_created = Column(DateTime, default=datetime.now)
     date_updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    # Relations
     contract = relationship('Contract', back_populates='events')
     support_contact = relationship('User', back_populates='events')
-
-
-    
