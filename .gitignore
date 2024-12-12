@@ -10,3 +10,4 @@ epicevents/.pytest_cache/
 epicevents/test_connexion.py
 epicevents/create_tables.py
 epicevents/flake-report/
+flake-report/
